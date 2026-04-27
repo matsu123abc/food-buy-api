@@ -144,8 +144,14 @@ async def ui():
 <h2>栄養計算ツール</h2>
 
 <div class="card">
-  <label>食品名（カンマ区切り）</label>
-  <input id="foods" placeholder="鶏むね肉, ブロッコリー, 卵">
+  <label>食材を選択してください</label>
+
+  <div>
+    <label><input type="checkbox" class="food" value="鶏むね肉"> 鶏むね肉</label><br>
+    <label><input type="checkbox" class="food" value="ブロッコリー"> ブロッコリー</label><br>
+    <label><input type="checkbox" class="food" value="卵"> 卵</label><br>
+  </div>
+
   <button onclick="calc()">計算する</button>
 </div>
 
@@ -153,7 +159,15 @@ async def ui():
 
 <script>
 async function calc() {
-  const foods = document.getElementById("foods").value;
+  // ★ 選択された食材をまとめる
+  const selected = [...document.querySelectorAll(".food:checked")].map(x => x.value);
+
+  if (selected.length === 0) {
+    alert("食材を選択してください");
+    return;
+  }
+
+  const foods = selected.join(",");  // カンマ区切りで API に送る
 
   const res = await fetch("/nutrition", {
     method: "POST",
@@ -165,7 +179,6 @@ async function calc() {
   const summary = data.summary;
   const results = data.results;
 
-  // --- 合計栄養カード ---
   let html = `
     <div class="card">
       <h3>1日の合計栄養</h3>
@@ -173,13 +186,12 @@ async function calc() {
       <p>たんぱく質：${summary["たんぱく質"]} g</p>
       <p>脂質：${summary["脂質"]} g</p>
       <p>炭水化物：${summary["炭水化物"]} g</p>
+      <p>食物繊維：${summary["食物繊維"] ?? 0} g</p>
     </div>
   `;
 
-  // --- 食材ごとの栄養カード ---
   for (const food of Object.keys(results)) {
     const item = results[food];
-
     const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
     const nutrients = parsed?.nutrients ?? {};
 
@@ -187,7 +199,7 @@ async function calc() {
     const P = nutrients.PROCNT?.quantity ?? 0;
     const F = nutrients.FAT?.quantity ?? 0;
     const C = nutrients.CHOCDF?.quantity ?? 0;
-    const Fiber = nutrients.FIBTG?.quantity ?? 0;   // ★ 食物繊維を追加
+    const Fiber = nutrients.FIBTG?.quantity ?? 0;
 
     html += `
       <div class="card">
@@ -196,7 +208,7 @@ async function calc() {
         <p>たんぱく質：${P.toFixed(1)} g</p>
         <p>脂質：${F.toFixed(1)} g</p>
         <p>炭水化物：${C.toFixed(1)} g</p>
-        <p>食物繊維：${Fiber.toFixed(1)} g</p>   <!-- ★ 表示を追加 -->
+        <p>食物繊維：${Fiber.toFixed(1)} g</p>
       </div>
     `;
   }
