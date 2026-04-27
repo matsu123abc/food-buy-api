@@ -196,21 +196,11 @@ async function calc() {
   // --- 食材ごとの栄養カード ---
   for (const food of Object.keys(results)) {
 
-    // Edamam の nutrients を安全に取得
     const item = results[food];
     const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
 
-    if (!parsed) {
-      html += `
-        <div class="card">
-          <h3>${food}</h3>
-          <p>データ取得エラー</p>
-        </div>
-      `;
-      continue;
-    }
-
-    const nutrients = parsed.nutrients;
+    // nutrients が無い場合でもカードを作る
+    const nutrients = parsed?.nutrients ?? {};
 
     const P = nutrients.PROCNT?.quantity ?? 0;
     const F = nutrients.FAT?.quantity ?? 0;
