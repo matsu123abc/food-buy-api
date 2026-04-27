@@ -1,6 +1,7 @@
 import os
 import httpx
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -28,7 +29,7 @@ async def translate_to_english(text: str) -> str:
 
     headers = {
         "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
-        "Ocp-Apim-Subscription-Region": "japanwest",  # ★重要
+        "Ocp-Apim-Subscription-Region": "japanwest",
         "Content-Type": "application/json"
     }
 
@@ -65,7 +66,7 @@ async def fetch_nutrition(english_food: str):
 
 
 # -----------------------------
-# 栄養合計（PFC＋カロリー）
+# 栄養合計（日本語 summary）
 # -----------------------------
 def summarize_daily_nutrition(results: dict):
     total = {
@@ -89,6 +90,7 @@ def summarize_daily_nutrition(results: dict):
 
     return total
 
+
 # -----------------------------
 # メインAPI：食品 → 翻訳 → 栄養 → 合計
 # -----------------------------
@@ -107,7 +109,6 @@ async def get_nutrition(req: FoodRequest):
             "nutrition": nutrition
         }
 
-    # ★ 1日の合計栄養を計算
     summary = summarize_daily_nutrition(results)
 
     return {
@@ -124,3 +125,73 @@ async def get_nutrition(req: FoodRequest):
 async def translate_test(text: str):
     english = await translate_to_english(text)
     return {"original": text, "translated": english}
+
+
+# -----------------------------
+# UI（HTML）を main.py 内に統合
+# -----------------------------
+@app.get("/", response_class=HTMLResponse)
+async def ui():
+    return """
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>栄養計算ツール</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+  .card {
+    background: white; padding: 15px; margin-bottom: 15px;
+    border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  button {
+    width: 100%; padding: 12px; font-size: 18px;
+    border: none; background: #0078ff; color: white;
+    border-radius: 8px; margin-top: 10px;
+  }
+  input {
+    width: 100%; padding: 12px; font-size: 18px;
+    border-radius: 8px; border: 1px solid #ccc;
+  }
+</style>
+</head>
+<body>
+
+<h2>栄養計算ツール</h2>
+
+<div class="card">
+  <label>食品名（カンマ区切り）</label>
+  <input id="foods" placeholder="鶏むね肉, ブロッコリー, 卵">
+  <button onclick="calc()">計算する</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+async function calc() {
+  const foods = document.getElementById("foods").value;
+
+  const res = await fetch("/nutrition", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({foods})
+  });
+
+  const data = await res.json();
+  const summary = data.summary;
+
+  document.getElementById("result").innerHTML = `
+    <div class="card">
+      <h3>1日の合計栄養</h3>
+      <p>カロリー：${summary["カロリー"]} kcal</p>
+      <p>たんぱく質：${summary["たんぱく質"]} g</p>
+      <p>脂質：${summary["脂質"]} g</p>
+      <p>炭水化物：${summary["炭水化物"]} g</p>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
+"""
