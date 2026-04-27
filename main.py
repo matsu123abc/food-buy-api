@@ -80,3 +80,9 @@ async def get_nutrition(data: FoodRequest):
 @app.get("/")
 def root():
     return {"message": "food-buy-api is running"}
+
+@app.get("/translate-test")
+async def translate_test(text: str):
+    english = await translate_to_english(text)
+    return {"original": text, "translated": english}
+
