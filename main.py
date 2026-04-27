@@ -179,8 +179,10 @@ async function calc() {
 
   const data = await res.json();
   const summary = data.summary;
+  const results = data.results;
 
-  document.getElementById("result").innerHTML = `
+  // --- 合計栄養カード ---
+  let html = `
     <div class="card">
       <h3>1日の合計栄養</h3>
       <p>カロリー：${summary["カロリー"]} kcal</p>
@@ -189,6 +191,26 @@ async function calc() {
       <p>炭水化物：${summary["炭水化物"]} g</p>
     </div>
   `;
+
+  // --- 食品ごとの栄養カード ---
+  for (const food of Object.keys(results)) {
+    const nutrients = results[food].nutrition.ingredients[0].parsed[0].nutrients;
+
+    const P = nutrients.PROCNT?.quantity ?? 0;
+    const F = nutrients.FAT?.quantity ?? 0;
+    const C = nutrients.CHOCDF?.quantity ?? 0;
+
+    html += `
+      <div class="card">
+        <h3>${food}</h3>
+        <p>P：${P.toFixed(1)} g</p>
+        <p>F：${F.toFixed(1)} g</p>
+        <p>C：${C.toFixed(1)} g</p>
+      </div>
+    `;
+  }
+
+  document.getElementById("result").innerHTML = html;
 }
 </script>
 
