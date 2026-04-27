@@ -133,6 +133,7 @@ async def translate_test(text: str):
 @app.get("/", response_class=HTMLResponse)
 async def ui():
     return """
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -192,7 +193,7 @@ async function calc() {
     </div>
   `;
 
-  // --- 食品ごとの栄養カード ---
+  // --- 食材ごとの栄養カード ---
   for (const food of Object.keys(results)) {
     const nutrients = results[food].nutrition.ingredients[0].parsed[0].nutrients;
 
@@ -216,4 +217,5 @@ async function calc() {
 
 </body>
 </html>
+
 """
