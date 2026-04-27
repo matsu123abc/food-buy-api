@@ -5,38 +5,43 @@ import os
 
 app = FastAPI()
 
-# APIキーは App Service の「構成 → アプリケーション設定」で設定
-API_KEY = os.getenv("NINJA_API_KEY")
-NUTRITION_URL = "https://api.api-ninjas.com/v1/nutrition"
+# Azure App Service のアプリ設定に登録した値
+EDAMAM_APP_ID = os.getenv("EDAMAM_APP_ID")
+EDAMAM_APP_KEY = os.getenv("EDAMAM_APP_KEY")
 
 class FoodRequest(BaseModel):
-    foods: str   # 例: "鶏むね肉, ブロッコリー, 卵"
+    foods: str   # 例: "chicken breast, broccoli, egg"
 
-# 栄養API呼び出し
-async def fetch_nutrition(food_name: str):
-    headers = {"X-Api-Key": API_KEY}
-    params = {"query": food_name}
-
+# Edamam 栄養 API 呼び出し
+async def fetch_nutrition(english_food: str):
+    url = (
+        "https://api.edamam.com/api/nutrition-data"
+        f"?app_id={EDAMAM_APP_ID}&app_key={EDAMAM_APP_KEY}"
+        f"&ingr={english_food}"
+    )
     async with httpx.AsyncClient() as client:
-        r = await client.get(NUTRITION_URL, headers=headers, params=params)
+        r = await client.get(url)
         return r.json()
 
 @app.post("/nutrition")
 async def get_nutrition(data: FoodRequest):
 
-    # 入力された食品を分割
+    # 食品を分割
     food_list = [f.strip() for f in data.foods.split(",")]
 
     results = {}
 
-    # 食品ごとにAPIを呼び出す
     for food in food_list:
-        res = await fetch_nutrition(food)
-        results[food] = res
+        # 英語食品名をそのまま Edamam に送る
+        nutrition = await fetch_nutrition(food)
+
+        results[food] = {
+            "nutrition": nutrition
+        }
 
     return {
         "foods": food_list,
-        "nutrition": results
+        "results": results
     }
 
 @app.get("/")
