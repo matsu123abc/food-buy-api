@@ -7,12 +7,13 @@ from pydantic import BaseModel
 app = FastAPI()
 
 # -----------------------------
-# 環境変数
+# 日本語 → 英語 辞書（必要に応じて追加可能）
 # -----------------------------
-TRANSLATOR_KEY = os.getenv("TRANSLATOR_KEY")
-TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT")
-EDAMAM_APP_ID = os.getenv("EDAMAM_APP_ID")
-EDAMAM_APP_KEY = os.getenv("EDAMAM_APP_KEY")
+JP_TO_EN = {
+    "鶏むね肉": "chicken breast",
+    "ブロッコリー": "broccoli",
+    "卵": "egg",
+}
 
 # -----------------------------
 # 入力モデル
@@ -22,24 +23,10 @@ class FoodRequest(BaseModel):
 
 
 # -----------------------------
-# 翻訳処理（毎回独立したリクエスト）
+# 辞書変換（翻訳 API 不使用）
 # -----------------------------
-async def translate_to_english(text: str) -> str:
-    url = f"{TRANSLATOR_ENDPOINT}/translate?api-version=3.0&to=en"
-
-    headers = {
-        "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
-        "Ocp-Apim-Subscription-Region": "japanwest",
-        "Content-Type": "application/json"
-    }
-
-    body = [{"text": text}]
-
-    # ★ 文脈を持たせないため、毎回新しい Client を作る
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.post(url, headers=headers, json=body)
-
-    return r.json()[0]["translations"][0]["text"]
+def translate_to_english_local(text: str) -> str:
+    return JP_TO_EN.get(text, text)
 
 
 # -----------------------------
@@ -50,7 +37,8 @@ async def fetch_nutrition(english_food: str):
 
     url = (
         "https://api.edamam.com/api/nutrition-data"
-        f"?app_id={EDAMAM_APP_ID}&app_key={EDAMAM_APP_KEY}"
+        f"?app_id={os.getenv('EDAMAM_APP_ID')}"
+        f"&app_key={os.getenv('EDAMAM_APP_KEY')}"
         f"&ingr={query}"
     )
 
@@ -87,7 +75,7 @@ def summarize_daily_nutrition(results: dict):
 
 
 # -----------------------------
-# メインAPI：食品 → 翻訳 → 栄養 → 合計
+# メインAPI：食品 → 辞書変換 → 栄養 → 合計
 # -----------------------------
 @app.post("/nutrition")
 async def get_nutrition(req: FoodRequest):
@@ -96,8 +84,8 @@ async def get_nutrition(req: FoodRequest):
     results = {}
 
     for food in foods:
-        # ★ 1 食材ずつ翻訳（文脈を持たせない）
-        english = await translate_to_english(food)
+        # ★ 辞書変換（翻訳 API 不使用）
+        english = translate_to_english_local(food)
 
         # ★ 1 食材ずつ Edamam に投げる
         nutrition = await fetch_nutrition(english)
