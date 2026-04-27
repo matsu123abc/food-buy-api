@@ -198,10 +198,8 @@ async function calc() {
 
     const item = results[food];
 
-    // 安全に nutrients を取得（存在しなくても止まらない）
-    const parsed =
-      item?.nutrition?.ingredients?.[0]?.parsed?.[0] ?? null;
-
+    // ここが重要：安全に nutrients を取り出す
+    const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
     const nutrients = parsed?.nutrients ?? {};
 
     const P = nutrients.PROCNT?.quantity ?? 0;
