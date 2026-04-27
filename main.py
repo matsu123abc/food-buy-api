@@ -193,25 +193,16 @@ async function calc() {
     </div>
   `;
 
-  // --- 食材ごとの栄養カード ---
+  // --- 食材ごとの Result をそのまま表示 ---
   for (const food of Object.keys(results)) {
-
     const item = results[food];
-
-    // ここが重要：安全に nutrients を取り出す
-    const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
-    const nutrients = parsed?.nutrients ?? {};
-
-    const P = nutrients.PROCNT?.quantity ?? 0;
-    const F = nutrients.FAT?.quantity ?? 0;
-    const C = nutrients.CHOCDF?.quantity ?? 0;
 
     html += `
       <div class="card">
         <h3>${food}</h3>
-        <p>P：${P.toFixed(1)} g</p>
-        <p>F：${F.toFixed(1)} g</p>
-        <p>C：${C.toFixed(1)} g</p>
+        <pre style="white-space: pre-wrap; font-size: 12px;">
+${JSON.stringify(item, null, 2)}
+        </pre>
       </div>
     `;
   }
