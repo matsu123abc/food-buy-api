@@ -22,7 +22,7 @@ class FoodRequest(BaseModel):
 
 
 # -----------------------------
-# 翻訳処理
+# 翻訳処理（毎回独立したリクエスト）
 # -----------------------------
 async def translate_to_english(text: str) -> str:
     url = f"{TRANSLATOR_ENDPOINT}/translate?api-version=3.0&to=en"
@@ -35,13 +35,11 @@ async def translate_to_english(text: str) -> str:
 
     body = [{"text": text}]
 
+    # ★ 文脈を持たせないため、毎回新しい Client を作る
     async with httpx.AsyncClient(timeout=10.0) as client:
         r = await client.post(url, headers=headers, json=body)
 
-    try:
-        return r.json()[0]["translations"][0]["text"]
-    except:
-        return f"TRANSLATOR_ERROR: {r.text}"
+    return r.json()[0]["translations"][0]["text"]
 
 
 # -----------------------------
@@ -59,10 +57,7 @@ async def fetch_nutrition(english_food: str):
     async with httpx.AsyncClient(timeout=10.0) as client:
         r = await client.get(url)
 
-    try:
-        return r.json()
-    except:
-        return {"error": "NOT_JSON", "content": r.text}
+    return r.json()
 
 
 # -----------------------------
@@ -101,10 +96,10 @@ async def get_nutrition(req: FoodRequest):
     results = {}
 
     for food in foods:
-        # 1 食材ずつ翻訳
+        # ★ 1 食材ずつ翻訳（文脈を持たせない）
         english = await translate_to_english(food)
 
-        # 1 食材ずつ Edamam に投げる
+        # ★ 1 食材ずつ Edamam に投げる
         nutrition = await fetch_nutrition(english)
 
         results[food] = {
@@ -122,21 +117,11 @@ async def get_nutrition(req: FoodRequest):
 
 
 # -----------------------------
-# 翻訳テスト用
-# -----------------------------
-@app.get("/translate-test")
-async def translate_test(text: str):
-    english = await translate_to_english(text)
-    return {"original": text, "translated": english}
-
-
-# -----------------------------
-# UI（HTML）を main.py 内に統合
+# UI（HTML）統合
 # -----------------------------
 @app.get("/", response_class=HTMLResponse)
 async def ui():
     return """
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -216,5 +201,4 @@ ${JSON.stringify(item, null, 2)}
 
 </body>
 </html>
-
 """
