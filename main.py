@@ -20,6 +20,7 @@ async def translate_to_english(text: str):
     url = f"{TRANSLATOR_ENDPOINT}/translate?api-version=3.0&to=en"
     headers = {
         "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
+        "Ocp-Apim-Subscription-Region": "japanwest",  # ← これが必須
         "Content-Type": "application/json"
     }
     body = [{"text": text}]
