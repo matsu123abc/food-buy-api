@@ -197,9 +197,11 @@ async function calc() {
   for (const food of Object.keys(results)) {
 
     const item = results[food];
-    const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
 
-    // nutrients が無い場合でもカードを作る
+    // 安全に nutrients を取得（存在しなくても止まらない）
+    const parsed =
+      item?.nutrition?.ingredients?.[0]?.parsed?.[0] ?? null;
+
     const nutrients = parsed?.nutrients ?? {};
 
     const P = nutrients.PROCNT?.quantity ?? 0;
