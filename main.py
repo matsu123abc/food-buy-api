@@ -101,7 +101,10 @@ async def get_nutrition(req: FoodRequest):
     results = {}
 
     for food in foods:
+        # 1 食材ずつ翻訳
         english = await translate_to_english(food)
+
+        # 1 食材ずつ Edamam に投げる
         nutrition = await fetch_nutrition(english)
 
         results[food] = {
