@@ -180,7 +180,6 @@ async function calc() {
   for (const food of Object.keys(results)) {
     const item = results[food];
 
-    // 安全に nutrients を取り出す
     const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
     const nutrients = parsed?.nutrients ?? {};
 
@@ -188,6 +187,7 @@ async function calc() {
     const P = nutrients.PROCNT?.quantity ?? 0;
     const F = nutrients.FAT?.quantity ?? 0;
     const C = nutrients.CHOCDF?.quantity ?? 0;
+    const Fiber = nutrients.FIBTG?.quantity ?? 0;   // ★ 食物繊維を追加
 
     html += `
       <div class="card">
@@ -196,6 +196,7 @@ async function calc() {
         <p>たんぱく質：${P.toFixed(1)} g</p>
         <p>脂質：${F.toFixed(1)} g</p>
         <p>炭水化物：${C.toFixed(1)} g</p>
+        <p>食物繊維：${Fiber.toFixed(1)} g</p>   <!-- ★ 表示を追加 -->
       </div>
     `;
   }
