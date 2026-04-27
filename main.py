@@ -27,6 +27,14 @@ async def translate_to_english(text: str):
     async with httpx.AsyncClient() as client:
         r = await client.post(url, headers=headers, json=body)
         result = r.json()
+
+        # エラー内容を確認するための安全ガード
+        if "error" in result:
+            return f"TRANSLATOR_ERROR: {result['error']}"
+
+        if not result or "translations" not in result[0]:
+            return "TRANSLATOR_EMPTY"
+
         return result[0]["translations"][0]["text"]
 
 # Edamam 栄養 API 呼び出し
