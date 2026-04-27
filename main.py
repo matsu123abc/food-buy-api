@@ -69,26 +69,25 @@ async def fetch_nutrition(english_food: str):
 # -----------------------------
 def summarize_daily_nutrition(results: dict):
     total = {
-        "calories": 0,
-        "protein": 0,
-        "fat": 0,
-        "carbs": 0
+        "カロリー": 0,
+        "たんぱく質": 0,
+        "脂質": 0,
+        "炭水化物": 0
     }
 
     for food, data in results.items():
         try:
             nutrients = data["nutrition"]["ingredients"][0]["parsed"][0]["nutrients"]
 
-            total["calories"] += nutrients.get("ENERC_KCAL", {}).get("quantity", 0)
-            total["protein"]  += nutrients.get("PROCNT", {}).get("quantity", 0)
-            total["fat"]      += nutrients.get("FAT", {}).get("quantity", 0)
-            total["carbs"]    += nutrients.get("CHOCDF", {}).get("quantity", 0)
+            total["カロリー"] += nutrients.get("ENERC_KCAL", {}).get("quantity", 0)
+            total["たんぱく質"] += nutrients.get("PROCNT", {}).get("quantity", 0)
+            total["脂質"]     += nutrients.get("FAT", {}).get("quantity", 0)
+            total["炭水化物"] += nutrients.get("CHOCDF", {}).get("quantity", 0)
 
         except:
             pass
 
     return total
-
 
 # -----------------------------
 # メインAPI：食品 → 翻訳 → 栄養 → 合計
