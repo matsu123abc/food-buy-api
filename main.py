@@ -530,6 +530,4 @@ async function calc() {
 
 </body>
 </html>
-   
-
 """
