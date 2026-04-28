@@ -1,8 +1,18 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
+from openai import AzureOpenAI
 
 app = FastAPI()
+
+# ============================
+# Azure OpenAI クライアント
+# ============================
+client = AzureOpenAI(
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+)
 
 class FoodRequest(BaseModel):
     foods: str  # "鶏むね肉,ブロッコリー,卵" など
@@ -185,12 +195,55 @@ def summarize_from_db(selected: list[str]):
 
     return results, total
 
-
 @app.post("/nutrition")
 async def nutrition(req: FoodRequest):
     foods = req.foods.split(",")
     results, summary = summarize_from_db(foods)
     return JSONResponse({"results": results, "summary": summary})
+
+
+# -----------------------------
+# AI コメント生成（SerpAPI ニュース版）
+# -----------------------------
+@app.post("/ai_analysis")
+async def ai_analysis(data: dict):
+    summary = data["summary"]
+
+    prompt = f"""
+あなたはプロの栄養士です。
+以下は、ユーザーが選択した食材（すべて100g換算）の合計栄養です。
+
+【合計栄養】
+- カロリー: {summary["カロリー"]} kcal
+- たんぱく質: {summary["たんぱく質"]} g
+- 脂質: {summary["脂質"]} g
+- 炭水化物: {summary["炭水化物"]} g
+- 食物繊維: {summary["食物繊維"]} g
+- 糖質: {summary["糖質"]} g
+
+以下を日本語で出力してください：
+
+### 1. 栄養バランス総合スコア（100点満点）
+（点数のみ）
+
+### 2. 良い点
+（箇条書きで3つ）
+
+### 3. 改善点
+（箇条書きで3つ）
+
+### 4. 総合コメント
+（短く、わかりやすく）
+"""
+
+    res = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_tokens=800
+    )
+
+    return {"analysis": res.choices[0].message.content.strip()}
 
 
 # ---------------------------------------------------------
@@ -455,6 +508,23 @@ async function calc() {
       </div>
     `;
   }
+
+  /* ▼▼▼ ここから AI 栄養分析を追加 ▼▼▼ */
+  const aiRes = await fetch("/ai_analysis", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ summary })
+  });
+
+  const aiData = await aiRes.json();
+
+  html += `
+    <div class="card">
+      <h3>AI 栄養分析</h3>
+      <div>${aiData.analysis.replace(/\n/g, "<br>")}</div>
+    </div>
+  `;
+  /* ▲▲▲ AI 栄養分析ここまで ▲▲▲ */
 
   document.getElementById("result").innerHTML = html;
 }
