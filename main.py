@@ -265,7 +265,6 @@ async def ui():
 
   h2 { margin-bottom: 10px; }
 
-  /* ← 追加した部分 */
   .info-note {
     font-size: 16px;
     color: #555;
@@ -318,126 +317,16 @@ async def ui():
 <body>
 
 <h2>買い物 栄養バランス分析ツール</h2>
-
 <div class="info-note">※ すべて100g換算で計算しています</div>
 
-<!-- 選択中の食材 -->
 <div class="selected-box">
   <strong>選択中の食材：</strong>
   <span id="selected-list">なし</span>
 </div>
 
 <!-- ▼▼▼ 食材カテゴリ（100 食材版） ▼▼▼ -->
-
-<div class="category-title">🍖 肉類</div>
-<div>
-  <div class="food-btn" data-food="鶏むね肉">鶏むね肉</div>
-  <div class="food-btn" data-food="鶏もも肉">鶏もも肉</div>
-  <div class="food-btn" data-food="ささみ">ささみ</div>
-  <div class="food-btn" data-food="豚ロース">豚ロース</div>
-  <div class="food-btn" data-food="豚バラ">豚バラ</div>
-  <div class="food-btn" data-food="豚もも">豚もも</div>
-  <div class="food-btn" data-food="豚ひき肉">豚ひき肉</div>
-  <div class="food-btn" data-food="牛もも">牛もも</div>
-  <div class="food-btn" data-food="牛肩ロース">牛肩ロース</div>
-  <div class="food-btn" data-food="牛バラ">牛バラ</div>
-  <div class="food-btn" data-food="牛ひき肉">牛ひき肉</div>
-  <div class="food-btn" data-food="ハム">ハム</div>
-  <div class="food-btn" data-food="ベーコン">ベーコン</div>
-  <div class="food-btn" data-food="ソーセージ">ソーセージ</div>
-</div>
-
-<div class="category-title">🐟 魚介</div>
-<div>
-  <div class="food-btn" data-food="鮭（サーモン）">鮭（サーモン）</div>
-  <div class="food-btn" data-food="サバ">サバ</div>
-  <div class="food-btn" data-food="アジ">アジ</div>
-  <div class="food-btn" data-food="イワシ">イワシ</div>
-  <div class="food-btn" data-food="ブリ">ブリ</div>
-  <div class="food-btn" data-food="タラ">タラ</div>
-  <div class="food-btn" data-food="カレイ">カレイ</div>
-  <div class="food-btn" data-food="ヒラメ">ヒラメ</div>
-  <div class="food-btn" data-food="マグロ赤身">マグロ赤身</div>
-  <div class="food-btn" data-food="マグロ中トロ">マグロ中トロ</div>
-  <div class="food-btn" data-food="エビ">エビ</div>
-  <div class="food-btn" data-food="イカ">イカ</div>
-  <div class="food-btn" data-food="タコ">タコ</div>
-  <div class="food-btn" data-food="ホタテ">ホタテ</div>
-  <div class="food-btn" data-food="しじみ">しじみ</div>
-  <div class="food-btn" data-food="アサリ">アサリ</div>
-  <div class="food-btn" data-food="サンマ">サンマ</div>
-  <div class="food-btn" data-food="ニシン">ニシン</div>
-  <div class="food-btn" data-food="カツオ">カツオ</div>
-  <div class="food-btn" data-food="うなぎ">うなぎ</div>
-</div>
-
-<div class="category-title">🥦 野菜</div>
-<div>
-  <div class="food-btn" data-food="キャベツ">キャベツ</div>
-  <div class="food-btn" data-food="レタス">レタス</div>
-  <div class="food-btn" data-food="白菜">白菜</div>
-  <div class="food-btn" data-food="ほうれん草">ほうれん草</div>
-  <div class="food-btn" data-food="小松菜">小松菜</div>
-  <div class="food-btn" data-food="ブロッコリー">ブロッコリー</div>
-  <div class="food-btn" data-food="カリフラワー">カリフラワー</div>
-  <div class="food-btn" data-food="にんじん">にんじん</div>
-  <div class="food-btn" data-food="玉ねぎ">玉ねぎ</div>
-  <div class="food-btn" data-food="じゃがいも">じゃがいも</div>
-  <div class="food-btn" data-food="さつまいも">さつまいも</div>
-  <div class="food-btn" data-food="大根">大根</div>
-  <div class="food-btn" data-food="ごぼう">ごぼう</div>
-  <div class="food-btn" data-food="れんこん">れんこん</div>
-  <div class="food-btn" data-food="たけのこ">たけのこ</div>
-  <div class="food-btn" data-food="ピーマン">ピーマン</div>
-  <div class="food-btn" data-food="パプリカ">パプリカ</div>
-  <div class="food-btn" data-food="なす">なす</div>
-  <div class="food-btn" data-food="きゅうり">きゅうり</div>
-  <div class="food-btn" data-food="トマト">トマト</div>
-  <div class="food-btn" data-food="ミニトマト">ミニトマト</div>
-  <div class="food-btn" data-food="もやし">もやし</div>
-  <div class="food-btn" data-food="長ねぎ">長ねぎ</div>
-  <div class="food-btn" data-food="にら">にら</div>
-  <div class="food-btn" data-food="生姜">生姜</div>
-</div>
-
-<div class="category-title">🥚 卵・乳製品</div>
-<div>
-  <div class="food-btn" data-food="卵">卵</div>
-  <div class="food-btn" data-food="牛乳">牛乳</div>
-  <div class="food-btn" data-food="ヨーグルト（無糖）">ヨーグルト（無糖）</div>
-  <div class="food-btn" data-food="ヨーグルト（加糖）">ヨーグルト（加糖）</div>
-  <div class="food-btn" data-food="プロセスチーズ">プロセスチーズ</div>
-  <div class="food-btn" data-food="カッテージチーズ">カッテージチーズ</div>
-  <div class="food-btn" data-food="バター">バター</div>
-  <div class="food-btn" data-food="生クリーム">生クリーム</div>
-</div>
-
-<div class="category-title">🫘 豆類・大豆製品</div>
-<div>
-  <div class="food-btn" data-food="納豆">納豆</div>
-  <div class="food-btn" data-food="木綿豆腐">木綿豆腐</div>
-  <div class="food-btn" data-food="絹ごし豆腐">絹ごし豆腐</div>
-  <div class="food-btn" data-food="おから">おから</div>
-  <div class="food-btn" data-food="枝豆">枝豆</div>
-  <div class="food-btn" data-food="きな粉">きな粉</div>
-  <div class="food-btn" data-food="豆乳（無調整）">豆乳（無調整）</div>
-</div>
-
-<div class="category-title">🍚 主食</div>
-<div>
-  <div class="food-btn" data-food="白ご飯">白ご飯</div>
-  <div class="food-btn" data-food="玄米ご飯">玄米ご飯</div>
-  <div class="food-btn" data-food="食パン">食パン</div>
-  <div class="food-btn" data-food="ロールパン">ロールパン</div>
-  <div class="food-btn" data-food="クロワッサン">クロワッサン</div>
-  <div class="food-btn" data-food="うどん（ゆで）">うどん（ゆで）</div>
-  <div class="food-btn" data-food="そば（ゆで）">そば（ゆで）</div>
-  <div class="food-btn" data-food="パスタ（ゆで）">パスタ（ゆで）</div>
-  <div class="food-btn" data-food="中華麺（ゆで）">中華麺（ゆで）</div>
-  <div class="food-btn" data-food="餅">餅</div>
-</div>
-
-<!-- ▲▲▲ 食材カテゴリ（100 食材版） ▲▲▲ -->
+（※ 章さんの食材ボタン部分はそのまま残してください）
+<!-- ▲▲▲ 食材カテゴリ ▲▲▲ -->
 
 <button onclick="calc()">栄養を計算する</button>
 
@@ -482,35 +371,35 @@ async function calc() {
   const summary = data.summary;
   const results = data.results;
 
-  let html = `
+  let html = \`
     <div class="card">
       <h3>1日の合計栄養（100g換算）</h3>
-      <p>カロリー：${summary["カロリー"]} kcal</p>
-      <p>たんぱく質：${summary["たんぱく質"]} g</p>
-      <p>脂質：${summary["脂質"]} g</p>
-      <p>炭水化物：${summary["炭水化物"]} g</p>
-      <p>食物繊維：${summary["食物繊維"]} g</p>
-      <p>糖質：${summary["糖質"]} g</p>
+      <p>カロリー：\${summary["カロリー"]} kcal</p>
+      <p>たんぱく質：\${summary["たんぱく質"]} g</p>
+      <p>脂質：\${summary["脂質"]} g</p>
+      <p>炭水化物：\${summary["炭水化物"]} g</p>
+      <p>食物繊維：\${summary["食物繊維"]} g</p>
+      <p>糖質：\${summary["糖質"]} g</p>
     </div>
-  `;
+  \`;
 
   for (const food of Object.keys(results)) {
     const item = results[food];
 
-    html += `
+    html += \`
       <div class="card">
-        <h3>${food}（100g）</h3>
-        <p>カロリー：${item.kcal.toFixed(1)} kcal</p>
-        <p>たんぱく質：${item.protein.toFixed(1)} g</p>
-        <p>脂質：${item.fat.toFixed(1)} g</p>
-        <p>炭水化物：${item.carb.toFixed(1)} g</p>
-        <p>食物繊維：${item.fiber.toFixed(1)} g</p>
-        <p>糖質：${item.sugar.toFixed(1)} g</p>
+        <h3>\${food}（100g）</h3>
+        <p>カロリー：\${item.kcal.toFixed(1)} kcal</p>
+        <p>たんぱく質：\${item.protein.toFixed(1)} g</p>
+        <p>脂質：\${item.fat.toFixed(1)} g</p>
+        <p>炭水化物：\${item.carb.toFixed(1)} g</p>
+        <p>食物繊維：\${item.fiber.toFixed(1)} g</p>
+        <p>糖質：\${item.sugar.toFixed(1)} g</p>
       </div>
-    `;
+    \`;
   }
 
-  /* ▼▼▼ ここから AI 栄養分析を追加 ▼▼▼ */
+  /* ▼▼▼ AI 栄養分析 ▼▼▼ */
   const aiRes = await fetch("/ai_analysis", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -519,13 +408,13 @@ async function calc() {
 
   const aiData = await aiRes.json();
 
-  html += `
+  html += \`
     <div class="card">
       <h3>AI 栄養分析</h3>
-      <div>${aiData.analysis.replace(/\n/g, "<br>")}</div>
+      <div>\${aiData.analysis.replace(/\\n/g, "<br>")}</div>
     </div>
-  `;
-  /* ▲▲▲ AI 栄養分析ここまで ▲▲▲ */
+  \`;
+  /* ▲▲▲ AI 栄養分析 ▲▲▲ */
 
   document.getElementById("result").innerHTML = html;
 }
@@ -533,5 +422,6 @@ async function calc() {
 
 </body>
 </html>
+   
 
 """
