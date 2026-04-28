@@ -318,6 +318,37 @@ async def ui():
     border: none; background: #0078ff; color: white;
     border-radius: 8px; margin-top: 20px;
   }
+  /* スマホ縦画面（幅480px以下）で文字とボタンをさらに大きく */
+  @media (max-width: 480px) {
+
+      body {
+          font-size: 22px;
+      }
+
+      summary {
+          font-size: 26px;
+          padding: 12px 0;
+      }
+
+      .food-row {
+          margin: 12px 0;
+      }
+
+      .food-btn {
+          font-size: 22px;
+          padding: 18px 22px;
+          border-radius: 12px;
+      }
+
+      .amount-select {
+          font-size: 22px;
+          padding: 10px 14px;
+      }
+
+      #selected-list {
+          font-size: 22px;
+      }
+  }
 </style>
 </head>
 
