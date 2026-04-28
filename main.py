@@ -272,7 +272,8 @@ async def ai_analysis(data: AIRequest):
 
 # ---------------------------------------------------------
 # ★ ここから HTML + JS を返すエンドポイント
-# ---------------------------------------------------------@app.get("/", response_class=HTMLResponse)
+# ---------------------------------------------------------
+@app.get("/", response_class=HTMLResponse)
 async def ui():
     return """
 <!DOCTYPE html>
