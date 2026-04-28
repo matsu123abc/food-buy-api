@@ -322,33 +322,34 @@ async def ui():
   @media (max-width: 480px) {
 
       body {
-          font-size: 22px;
+          font-size: 22px !important;
       }
 
       summary {
-          font-size: 26px;
-          padding: 12px 0;
+          font-size: 26px !important;
+          padding: 12px 0 !important;
       }
 
       .food-row {
-          margin: 12px 0;
+          margin: 12px 0 !important;
       }
 
       .food-btn {
-          font-size: 22px;
-          padding: 18px 22px;
-          border-radius: 12px;
+          font-size: 22px !important;
+          padding: 18px 22px !important;
+          border-radius: 12px !important;
       }
 
       .amount-select {
-          font-size: 22px;
-          padding: 10px 14px;
+          font-size: 22px !important;
+          padding: 10px 14px !important;
       }
 
       #selected-list {
-          font-size: 22px;
+          font-size: 22px !important;
       }
   }
+
 </style>
 </head>
 
