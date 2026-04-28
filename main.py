@@ -479,35 +479,32 @@ async function calc() {
   const summary = data.summary;
   const results = data.results;
 
-  let html = \`
-    <div class="card">
-      <h3>1日の合計栄養（100g換算）</h3>
-      <p>カロリー：\${summary["カロリー"]} kcal</p>
-      <p>たんぱく質：\${summary["たんぱく質"]} g</p>
-      <p>脂質：\${summary["脂質"]} g</p>
-      <p>炭水化物：\${summary["炭水化物"]} g</p>
-      <p>食物繊維：\${summary["食物繊維"]} g</p>
-      <p>糖質：\${summary["糖質"]} g</p>
-    </div>
-  \`;
+  let html = "";
+  html += '<div class="card">';
+  html += '<h3>1日の合計栄養（100g換算）</h3>';
+  html += '<p>カロリー：' + summary["カロリー"] + ' kcal</p>';
+  html += '<p>たんぱく質：' + summary["たんぱく質"] + ' g</p>';
+  html += '<p>脂質：' + summary["脂質"] + ' g</p>';
+  html += '<p>炭水化物：' + summary["炭水化物"] + ' g</p>';
+  html += '<p>食物繊維：' + summary["食物繊維"] + ' g</p>';
+  html += '<p>糖質：' + summary["糖質"] + ' g</p>';
+  html += '</div>';
 
   for (const food of Object.keys(results)) {
     const item = results[food];
 
-    html += \`
-      <div class="card">
-        <h3>\${food}（100g）</h3>
-        <p>カロリー：\${item.kcal.toFixed(1)} kcal</p>
-        <p>たんぱく質：\${item.protein.toFixed(1)} g</p>
-        <p>脂質：\${item.fat.toFixed(1)} g</p>
-        <p>炭水化物：\${item.carb.toFixed(1)} g</p>
-        <p>食物繊維：\${item.fiber.toFixed(1)} g</p>
-        <p>糖質：\${item.sugar.toFixed(1)} g</p>
-      </div>
-    \`;
+    html += '<div class="card">';
+    html += '<h3>' + food + '（100g）</h3>';
+    html += '<p>カロリー：' + item.kcal.toFixed(1) + ' kcal</p>';
+    html += '<p>たんぱく質：' + item.protein.toFixed(1) + ' g</p>';
+    html += '<p>脂質：' + item.fat.toFixed(1) + ' g</p>';
+    html += '<p>炭水化物：' + item.carb.toFixed(1) + ' g</p>';
+    html += '<p>食物繊維：' + item.fiber.toFixed(1) + ' g</p>';
+    html += '<p>糖質：' + item.sugar.toFixed(1) + ' g</p>';
+    html += '</div>';
   }
 
-  /* ▼▼▼ AI 栄養分析 ▼▼▼ */
+  // --- AI 栄養分析 ---
   const aiRes = await fetch("/ai_analysis", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -516,13 +513,10 @@ async function calc() {
 
   const aiData = await aiRes.json();
 
-  html += \`
-    <div class="card">
-      <h3>AI 栄養分析</h3>
-      <div>\${aiData.analysis.replace(/\\n/g, "<br>")}</div>
-    </div>
-  \`;
-  /* ▲▲▲ AI 栄養分析 ▲▲▲ */
+  html += '<div class="card">';
+  html += '<h3>AI 栄養分析</h3>';
+  html += '<div>' + aiData.analysis.replace(/\n/g, "<br>") + '</div>';
+  html += '</div>';
 
   document.getElementById("result").innerHTML = html;
 }
