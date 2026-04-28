@@ -71,7 +71,7 @@ def summarize_daily_nutrition(results: dict):
         "たんぱく質": 0,
         "脂質": 0,
         "炭水化物": 0,
-        "食物繊維": 0,   # ★ 追加
+        "食物繊維": 0,
     }
 
     for food, data in results.items():
@@ -82,9 +82,14 @@ def summarize_daily_nutrition(results: dict):
             total["たんぱく質"] += nutrients.get("PROCNT", {}).get("quantity", 0)
             total["脂質"]     += nutrients.get("FAT", {}).get("quantity", 0)
             total["炭水化物"] += nutrients.get("CHOCDF", {}).get("quantity", 0)
-            total["食物繊維"] += nutrients.get("FIBTG", {}).get("quantity", 0)  # ★ 追加
+            total["食物繊維"] += nutrients.get("FIBTG", {}).get("quantity", 0)
+
         except:
             pass
+
+    # ★ ここで小数点1桁に丸める
+    for key in total:
+        total[key] = round(total[key], 1)
 
     return total
 
