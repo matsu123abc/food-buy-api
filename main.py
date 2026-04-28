@@ -296,8 +296,6 @@ async def ui():
   <span id="selected-list">なし</span>
 </div>
 
-<!-- ▼▼▼ 食材カテゴリ（100 食材版） ▼▼▼ -->
-
 <div class="category-title">🍖 肉類</div>
 <div>
   <div class="food-btn" data-food="鶏むね肉">鶏むね肉</div>
@@ -406,8 +404,6 @@ async def ui():
   <div class="food-btn" data-food="餅">餅</div>
 </div>
 
-<!-- ▲▲▲ 食材カテゴリ ▲▲▲ -->
-
 <button onclick="calc()">栄養を計算する</button>
 
 <div id="result"></div>
@@ -485,7 +481,7 @@ async function calc() {
 
   html += '<div class="card">';
   html += '<h3>AI 栄養分析</h3>';
-  html += '<div>' + aiData.analysis.split("\n").join("<br>") + '</div>';
+  html += '<div>' + aiData.analysis.split("\\n").join("<br>") + '</div>';
   html += '</div>';
 
   document.getElementById("result").innerHTML = html;
@@ -494,4 +490,4 @@ async function calc() {
 
 </body>
 </html>
-"""  
+"""
