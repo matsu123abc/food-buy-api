@@ -72,22 +72,28 @@ def summarize_daily_nutrition(results: dict):
         "脂質": 0,
         "炭水化物": 0,
         "食物繊維": 0,
+        "糖質": 0,   # ★ 追加
     }
 
     for food, data in results.items():
         try:
             nutrients = data["nutrition"]["ingredients"][0]["parsed"][0]["nutrients"]
 
+            carb = nutrients.get("CHOCDF", {}).get("quantity", 0)
+            fiber = nutrients.get("FIBTG", {}).get("quantity", 0)
+            sugar = carb - fiber  # ★ 糖質計算
+
             total["カロリー"] += nutrients.get("ENERC_KCAL", {}).get("quantity", 0)
             total["たんぱく質"] += nutrients.get("PROCNT", {}).get("quantity", 0)
             total["脂質"]     += nutrients.get("FAT", {}).get("quantity", 0)
-            total["炭水化物"] += nutrients.get("CHOCDF", {}).get("quantity", 0)
-            total["食物繊維"] += nutrients.get("FIBTG", {}).get("quantity", 0)
+            total["炭水化物"] += carb
+            total["食物繊維"] += fiber
+            total["糖質"]     += sugar  # ★ 合計に追加
 
         except:
             pass
 
-    # ★ ここで小数点1桁に丸める
+    # ★ 小数点1桁に丸める
     for key in total:
         total[key] = round(total[key], 1)
 
@@ -392,6 +398,7 @@ async function calc() {
   const summary = data.summary;
   const results = data.results;
 
+  // 合計カード（糖質を追加）
   let html = `
     <div class="card">
       <h3>1日の合計栄養</h3>
@@ -399,20 +406,23 @@ async function calc() {
       <p>たんぱく質：${summary["たんぱく質"]} g</p>
       <p>脂質：${summary["脂質"]} g</p>
       <p>炭水化物：${summary["炭水化物"]} g</p>
-      <p>食物繊維：${summary["食物繊維"] ?? 0} g</p>
+      <p>食物繊維：${summary["食物繊維"]} g</p>
+      <p>糖質：${summary["糖質"]} g</p>
     </div>
   `;
 
+  // 食材ごとのカード（糖質を追加）
   for (const food of Object.keys(results)) {
     const item = results[food];
     const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
     const nutrients = parsed?.nutrients ?? {};
 
-    const kcal = nutrients.ENERC_KCAL?.quantity ?? 0;
-    const P = nutrients.PROCNT?.quantity ?? 0;
-    const F = nutrients.FAT?.quantity ?? 0;
-    const C = nutrients.CHOCDF?.quantity ?? 0;
-    const Fiber = nutrients.FIBTG?.quantity ?? 0;
+    const kcal  = nutrients.ENERC_KCAL?.quantity ?? 0;
+    const P     = nutrients.PROCNT?.quantity ?? 0;
+    const F     = nutrients.FAT?.quantity ?? 0;
+    const carb  = nutrients.CHOCDF?.quantity ?? 0;
+    const fiber = nutrients.FIBTG?.quantity ?? 0;
+    const sugar = carb - fiber;
 
     html += `
       <div class="card">
@@ -420,8 +430,9 @@ async function calc() {
         <p>カロリー：${kcal.toFixed(1)} kcal</p>
         <p>たんぱく質：${P.toFixed(1)} g</p>
         <p>脂質：${F.toFixed(1)} g</p>
-        <p>炭水化物：${C.toFixed(1)} g</p>
-        <p>食物繊維：${Fiber.toFixed(1)} g</p>
+        <p>炭水化物：${carb.toFixed(1)} g</p>
+        <p>食物繊維：${fiber.toFixed(1)} g</p>
+        <p>糖質：${sugar.toFixed(1)} g</p>
       </div>
     `;
   }
