@@ -206,45 +206,68 @@ async def nutrition(req: FoodRequest):
 # -----------------------------
 # AI コメント生成（SerpAPI ニュース版）
 # -----------------------------
+class AIRequest(BaseModel):
+    summary: dict
+    foods: list
+    details: dict
+
 @app.post("/ai_analysis")
-async def ai_analysis(data: dict):
-    summary = data["summary"]
+async def ai_analysis(data: AIRequest):
+
+    summary = data.summary
+    foods = data.foods
+    details = data.details
 
     prompt = f"""
-あなたはプロの栄養士です。
-以下は、ユーザーが選択した食材（すべて100g換算）の合計栄養です。
+あなたはプロの栄養士兼、買い物アドバイザーです。
+以下のデータをもとに、総合的な栄養分析と買い物アドバイスを行ってください。
 
-【合計栄養】
-- カロリー: {summary["カロリー"]} kcal
-- たんぱく質: {summary["たんぱく質"]} g
-- 脂質: {summary["脂質"]} g
-- 炭水化物: {summary["炭水化物"]} g
-- 食物繊維: {summary["食物繊維"]} g
-- 糖質: {summary["糖質"]} g
+### 1. 合計栄養の分析（summary）
+{summary}
 
-以下を日本語で出力してください：
+### 2. 選択された食材（foods）
+{foods}
+
+### 3. 食材ごとの栄養詳細（details）
+{details}
+
+---
+
+### 出力フォーマット（必ずこの形式で出力）
 
 ### 1. 栄養バランス総合スコア（100点満点）
-（点数のみ）
+数値だけ
 
 ### 2. 良い点
-（箇条書きで3つ）
+- 箇条書きで3〜5個
 
 ### 3. 改善点
-（箇条書きで3つ）
+- 箇条書きで3〜5個
 
-### 4. 総合コメント
-（短く、わかりやすく）
+### 4. 食材ごとの特徴まとめ
+- 食材名：特徴（高たんぱく、ビタミン豊富、低脂質など）
+
+### 5. 組み合わせの評価
+- 栄養的に良い点
+- 改善できる点
+
+### 6. 追加購入アドバイス
+- 不足栄養素を補うための具体的な食材を提案
+
+### 7. 総合コメント
+短くわかりやすくまとめる
 """
 
-    res = client.chat.completions.create(
-        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+    # OpenAI API 呼び出し
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=800
+        temperature=0.4
     )
 
-    return {"analysis": res.choices[0].message.content.strip()}
+    analysis_text = response.choices[0].message["content"]
+
+    return JSONResponse({"analysis": analysis_text})
 
 
 # ---------------------------------------------------------
@@ -474,7 +497,11 @@ async function calc() {
   const aiRes = await fetch("/ai_analysis", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ summary })
+    body: JSON.stringify({
+      summary: summary,
+      foods: selectedFoods,
+      details: results
+    })
   });
 
   const aiData = await aiRes.json();
