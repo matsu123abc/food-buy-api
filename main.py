@@ -197,196 +197,208 @@ async def nutrition(req: FoodRequest):
 # ★ ここから HTML + JS を返すエンドポイント
 # ---------------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-def index():
+async def ui():
     return """
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>栄養計算ツール</title>
+<title>買い物 栄養バランス分析ツール</title>
+
 <style>
-  body { font-family: sans-serif; padding: 20px; }
-  .card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; }
-  .food-btn { padding: 10px; margin: 5px; border-radius: 6px; border: 1px solid #888; cursor: pointer; }
-  .food-btn.selected { background-color: #4caf50; color: white; }
-  .accordion { cursor: pointer; padding: 10px; background: #eee; margin-top: 10px; }
-  .panel { display: none; padding: 10px; }
+  body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+
+  h2 { margin-bottom: 10px; }
+
+  .selected-box {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .category-title {
+    font-size: 20px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+
+  .food-btn {
+    display: inline-block;
+    padding: 12px 18px;
+    margin: 5px;
+    background: #e8f0fe;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .food-btn.selected {
+    background: #0078ff;
+    color: white;
+  }
+
+  .card {
+    background: white; padding: 15px; margin-bottom: 15px;
+    border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  button {
+    width: 100%; padding: 14px; font-size: 20px;
+    border: none; background: #0078ff; color: white;
+    border-radius: 8px; margin-top: 20px;
+  }
 </style>
 </head>
+
 <body>
 
-<h2>食材を選択</h2>
-<p>選択中：<span id="selected-list">なし</span></p>
+<h2>買い物 栄養バランス分析ツール</h2>
 
-<!-- ▼▼▼ ここからカテゴリ＋食材ボタン（完全復元） ▼▼▼ -->
-
-<!-- 肉類 -->
-<div class="accordion">肉類</div>
-<div class="panel">
-  <button class="food-btn" data-food="鶏むね肉">鶏むね肉</button>
-  <button class="food-btn" data-food="鶏もも肉">鶏もも肉</button>
-  <button class="food-btn" data-food="ささみ">ささみ</button>
-  <button class="food-btn" data-food="豚ロース">豚ロース</button>
-  <button class="food-btn" data-food="豚バラ">豚バラ</button>
-  <button class="food-btn" data-food="豚もも">豚もも</button>
-  <button class="food-btn" data-food="豚ひき肉">豚ひき肉</button>
-  <button class="food-btn" data-food="牛もも">牛もも</button>
-  <button class="food-btn" data-food="牛肩ロース">牛肩ロース</button>
-  <button class="food-btn" data-food="牛バラ">牛バラ</button>
-  <button class="food-btn" data-food="牛ひき肉">牛ひき肉</button>
-  <button class="food-btn" data-food="ハム">ハム</button>
-  <button class="food-btn" data-food="ベーコン">ベーコン</button>
-  <button class="food-btn" data-food="ソーセージ">ソーセージ</button>
+<!-- 選択中の食材 -->
+<div class="selected-box">
+  <strong>選択中の食材：</strong>
+  <span id="selected-list">なし</span>
 </div>
 
-<!-- 魚介類 -->
-<div class="accordion">魚介類</div>
-<div class="panel">
-  <button class="food-btn" data-food="鮭（サーモン）">鮭（サーモン）</button>
-  <button class="food-btn" data-food="サバ">サバ</button>
-  <button class="food-btn" data-food="アジ">アジ</button>
-  <button class="food-btn" data-food="イワシ">イワシ</button>
-  <button class="food-btn" data-food="ブリ">ブリ</button>
-  <button class="food-btn" data-food="タラ">タラ</button>
-  <button class="food-btn" data-food="カレイ">カレイ</button>
-  <button class="food-btn" data-food="ヒラメ">ヒラメ</button>
-  <button class="food-btn" data-food="マグロ赤身">マグロ赤身</button>
-  <button class="food-btn" data-food="マグロ中トロ">マグロ中トロ</button>
-  <button class="food-btn" data-food="エビ">エビ</button>
-  <button class="food-btn" data-food="イカ">イカ</button>
-  <button class="food-btn" data-food="タコ">タコ</button>
-  <button class="food-btn" data-food="ホタテ">ホタテ</button>
-  <button class="food-btn" data-food="しじみ">しじみ</button>
-  <button class="food-btn" data-food="アサリ">アサリ</button>
-  <button class="food-btn" data-food="サンマ">サンマ</button>
-  <button class="food-btn" data-food="ニシン">ニシン</button>
-  <button class="food-btn" data-food="カツオ">カツオ</button>
-  <button class="food-btn" data-food="うなぎ">うなぎ</button>
+<!-- ▼▼▼ 食材カテゴリ（100 食材版） ▼▼▼ -->
+
+<div class="category-title">🍖 肉類</div>
+<div>
+  <div class="food-btn" data-food="鶏むね肉">鶏むね肉</div>
+  <div class="food-btn" data-food="鶏もも肉">鶏もも肉</div>
+  <div class="food-btn" data-food="ささみ">ささみ</div>
+  <div class="food-btn" data-food="豚ロース">豚ロース</div>
+  <div class="food-btn" data-food="豚バラ">豚バラ</div>
+  <div class="food-btn" data-food="豚もも">豚もも</div>
+  <div class="food-btn" data-food="豚ひき肉">豚ひき肉</div>
+  <div class="food-btn" data-food="牛もも">牛もも</div>
+  <div class="food-btn" data-food="牛肩ロース">牛肩ロース</div>
+  <div class="food-btn" data-food="牛バラ">牛バラ</div>
+  <div class="food-btn" data-food="牛ひき肉">牛ひき肉</div>
+  <div class="food-btn" data-food="ハム">ハム</div>
+  <div class="food-btn" data-food="ベーコン">ベーコン</div>
+  <div class="food-btn" data-food="ソーセージ">ソーセージ</div>
 </div>
 
-<!-- 野菜 -->
-<div class="accordion">野菜</div>
-<div class="panel">
-  <button class="food-btn" data-food="キャベツ">キャベツ</button>
-  <button class="food-btn" data-food="レタス">レタス</button>
-  <button class="food-btn" data-food="白菜">白菜</button>
-  <button class="food-btn" data-food="ほうれん草">ほうれん草</button>
-  <button class="food-btn" data-food="小松菜">小松菜</button>
-  <button class="food-btn" data-food="ブロッコリー">ブロッコリー</button>
-  <button class="food-btn" data-food="カリフラワー">カリフラワー</button>
-  <button class="food-btn" data-food="にんじん">にんじん</button>
-  <button class="food-btn" data-food="玉ねぎ">玉ねぎ</button>
-  <button class="food-btn" data-food="じゃがいも">じゃがいも</button>
-  <button class="food-btn" data-food="さつまいも">さつまいも</button>
-  <button class="food-btn" data-food="大根">大根</button>
-  <button class="food-btn" data-food="ごぼう">ごぼう</button>
-  <button class="food-btn" data-food="れんこん">れんこん</button>
-  <button class="food-btn" data-food="たけのこ">たけのこ</button>
-  <button class="food-btn" data-food="ピーマン">ピーマン</button>
-  <button class="food-btn" data-food="パプリカ">パプリカ</button>
-  <button class="food-btn" data-food="なす">なす</button>
-  <button class="food-btn" data-food="きゅうり">きゅうり</button>
-  <button class="food-btn" data-food="トマト">トマト</button>
-  <button class="food-btn" data-food="ミニトマト">ミニトマト</button>
-  <button class="food-btn" data-food="もやし">もやし</button>
-  <button class="food-btn" data-food="長ねぎ">長ねぎ</button>
-  <button class="food-btn" data-food="にら">にら</button>
-  <button class="food-btn" data-food="生姜">生姜</button>
+<div class="category-title">🐟 魚介</div>
+<div>
+  <div class="food-btn" data-food="鮭（サーモン）">鮭（サーモン）</div>
+  <div class="food-btn" data-food="サバ">サバ</div>
+  <div class="food-btn" data-food="アジ">アジ</div>
+  <div class="food-btn" data-food="イワシ">イワシ</div>
+  <div class="food-btn" data-food="ブリ">ブリ</div>
+  <div class="food-btn" data-food="タラ">タラ</div>
+  <div class="food-btn" data-food="カレイ">カレイ</div>
+  <div class="food-btn" data-food="ヒラメ">ヒラメ</div>
+  <div class="food-btn" data-food="マグロ赤身">マグロ赤身</div>
+  <div class="food-btn" data-food="マグロ中トロ">マグロ中トロ</div>
+  <div class="food-btn" data-food="エビ">エビ</div>
+  <div class="food-btn" data-food="イカ">イカ</div>
+  <div class="food-btn" data-food="タコ">タコ</div>
+  <div class="food-btn" data-food="ホタテ">ホタテ</div>
+  <div class="food-btn" data-food="しじみ">しじみ</div>
+  <div class="food-btn" data-food="アサリ">アサリ</div>
+  <div class="food-btn" data-food="サンマ">サンマ</div>
+  <div class="food-btn" data-food="ニシン">ニシン</div>
+  <div class="food-btn" data-food="カツオ">カツオ</div>
+  <div class="food-btn" data-food="うなぎ">うなぎ</div>
 </div>
 
-<!-- 果物 -->
-<div class="accordion">果物</div>
-<div class="panel">
-  <button class="food-btn" data-food="りんご">りんご</button>
-  <button class="food-btn" data-food="バナナ">バナナ</button>
-  <button class="food-btn" data-food="みかん">みかん</button>
-  <button class="food-btn" data-food="いちご">いちご</button>
-  <button class="food-btn" data-food="ぶどう">ぶどう</button>
-  <button class="food-btn" data-food="梨">梨</button>
-  <button class="food-btn" data-food="柿">柿</button>
-  <button class="food-btn" data-food="スイカ">スイカ</button>
-  <button class="food-btn" data-food="メロン">メロン</button>
-  <button class="food-btn" data-food="パイナップル">パイナップル</button>
+<div class="category-title">🥦 野菜</div>
+<div>
+  <div class="food-btn" data-food="キャベツ">キャベツ</div>
+  <div class="food-btn" data-food="レタス">レタス</div>
+  <div class="food-btn" data-food="白菜">白菜</div>
+  <div class="food-btn" data-food="ほうれん草">ほうれん草</div>
+  <div class="food-btn" data-food="小松菜">小松菜</div>
+  <div class="food-btn" data-food="ブロッコリー">ブロッコリー</div>
+  <div class="food-btn" data-food="カリフラワー">カリフラワー</div>
+  <div class="food-btn" data-food="にんじん">にんじん</div>
+  <div class="food-btn" data-food="玉ねぎ">玉ねぎ</div>
+  <div class="food-btn" data-food="じゃがいも">じゃがいも</div>
+  <div class="food-btn" data-food="さつまいも">さつまいも</div>
+  <div class="food-btn" data-food="大根">大根</div>
+  <div class="food-btn" data-food="ごぼう">ごぼう</div>
+  <div class="food-btn" data-food="れんこん">れんこん</div>
+  <div class="food-btn" data-food="たけのこ">たけのこ</div>
+  <div class="food-btn" data-food="ピーマン">ピーマン</div>
+  <div class="food-btn" data-food="パプリカ">パプリカ</div>
+  <div class="food-btn" data-food="なす">なす</div>
+  <div class="food-btn" data-food="きゅうり">きゅうり</div>
+  <div class="food-btn" data-food="トマト">トマト</div>
+  <div class="food-btn" data-food="ミニトマト">ミニトマト</div>
+  <div class="food-btn" data-food="もやし">もやし</div>
+  <div class="food-btn" data-food="長ねぎ">長ねぎ</div>
+  <div class="food-btn" data-food="にら">にら</div>
+  <div class="food-btn" data-food="生姜">生姜</div>
 </div>
 
-<!-- 豆類 -->
-<div class="accordion">豆類・大豆製品</div>
-<div class="panel">
-  <button class="food-btn" data-food="木綿豆腐">木綿豆腐</button>
-  <button class="food-btn" data-food="絹ごし豆腐">絹ごし豆腐</button>
-  <button class="food-btn" data-food="厚揚げ">厚揚げ</button>
-  <button class="food-btn" data-food="油揚げ">油揚げ</button>
-  <button class="food-btn" data-food="納豆">納豆</button>
-  <button class="food-btn" data-food="おから">おから</button>
-  <button class="food-btn" data-food="ゆで大豆">ゆで大豆</button>
-  <button class="food-btn" data-food="枝豆">枝豆</button>
-  <button class="food-btn" data-food="きな粉">きな粉</button>
-  <button class="food-btn" data-food="豆乳（無調整）">豆乳（無調整）</button>
+<div class="category-title">🥚 卵・乳製品</div>
+<div>
+  <div class="food-btn" data-food="卵">卵</div>
+  <div class="food-btn" data-food="牛乳">牛乳</div>
+  <div class="food-btn" data-food="ヨーグルト（無糖）">ヨーグルト（無糖）</div>
+  <div class="food-btn" data-food="ヨーグルト（加糖）">ヨーグルト（加糖）</div>
+  <div class="food-btn" data-food="プロセスチーズ">プロセスチーズ</div>
+  <div class="food-btn" data-food="カッテージチーズ">カッテージチーズ</div>
+  <div class="food-btn" data-food="バター">バター</div>
+  <div class="food-btn" data-food="生クリーム">生クリーム</div>
 </div>
 
-<!-- 乳製品・卵 -->
-<div class="accordion">乳製品・卵</div>
-<div class="panel">
-  <button class="food-btn" data-food="牛乳">牛乳</button>
-  <button class="food-btn" data-food="低脂肪乳">低脂肪乳</button>
-  <button class="food-btn" data-food="無脂肪乳">無脂肪乳</button>
-  <button class="food-btn" data-food="ヨーグルト（無糖）">ヨーグルト（無糖）</button>
-  <button class="food-btn" data-food="ヨーグルト（加糖）">ヨーグルト（加糖）</button>
-  <button class="food-btn" data-food="プロセスチーズ">プロセスチーズ</button>
-  <button class="food-btn" data-food="カッテージチーズ">カッテージチーズ</button>
-  <button class="food-btn" data-food="バター">バター</button>
-  <button class="food-btn" data-food="生クリーム">生クリーム</button>
-  <button class="food-btn" data-food="卵">卵</button>
+<div class="category-title">🫘 豆類・大豆製品</div>
+<div>
+  <div class="food-btn" data-food="納豆">納豆</div>
+  <div class="food-btn" data-food="木綿豆腐">木綿豆腐</div>
+  <div class="food-btn" data-food="絹ごし豆腐">絹ごし豆腐</div>
+  <div class="food-btn" data-food="おから">おから</div>
+  <div class="food-btn" data-food="枝豆">枝豆</div>
+  <div class="food-btn" data-food="きな粉">きな粉</div>
+  <div class="food-btn" data-food="豆乳（無調整）">豆乳（無調整）</div>
 </div>
 
-<!-- 主食 -->
-<div class="accordion">主食（米・パン・麺）</div>
-<div class="panel">
-  <button class="food-btn" data-food="白ご飯">白ご飯</button>
-  <button class="food-btn" data-food="玄米ご飯">玄米ご飯</button>
-  <button class="food-btn" data-food="食パン">食パン</button>
-  <button class="food-btn" data-food="ロールパン">ロールパン</button>
-  <button class="food-btn" data-food="クロワッサン">クロワッサン</button>
-  <button class="food-btn" data-food="うどん（ゆで）">うどん（ゆで）</button>
-  <button class="food-btn" data-food="そば（ゆで）">そば（ゆで）</button>
-  <button class="food-btn" data-food="パスタ（ゆで）">パスタ（ゆで）</button>
-  <button class="food-btn" data-food="中華麺（ゆで）">中華麺（ゆで）</button>
-  <button class="food-btn" data-food="餅">餅</button>
+<div class="category-title">🍚 主食</div>
+<div>
+  <div class="food-btn" data-food="白ご飯">白ご飯</div>
+  <div class="food-btn" data-food="玄米ご飯">玄米ご飯</div>
+  <div class="food-btn" data-food="食パン">食パン</div>
+  <div class="food-btn" data-food="ロールパン">ロールパン</div>
+  <div class="food-btn" data-food="クロワッサン">クロワッサン</div>
+  <div class="food-btn" data-food="うどん（ゆで）">うどん（ゆで）</div>
+  <div class="food-btn" data-food="そば（ゆで）">そば（ゆで）</div>
+  <div class="food-btn" data-food="パスタ（ゆで）">パスタ（ゆで）</div>
+  <div class="food-btn" data-food="中華麺（ゆで）">中華麺（ゆで）</div>
+  <div class="food-btn" data-food="餅">餅</div>
 </div>
 
-<!-- ▲▲▲ ここまでカテゴリ＋食材ボタン ▲▲▲ -->
+<!-- ▲▲▲ 食材カテゴリ（100 食材版） ▲▲▲ -->
 
-<button onclick="calc()">計算する</button>
+<button onclick="calc()">栄養を計算する</button>
 
 <div id="result"></div>
 
 <script>
 let selectedFoods = [];
 
-// アコーディオン
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("accordion")) {
-    const panel = e.target.nextElementSibling;
-    panel.style.display = panel.style.display === "block" ? "none" : "block";
-  }
-});
-
-// 食材ボタン
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("food-btn")) {
-    const food = e.target.dataset.food;
+// 食材ボタンのクリック処理
+document.querySelectorAll(".food-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const food = btn.dataset.food;
 
     if (selectedFoods.includes(food)) {
       selectedFoods = selectedFoods.filter(f => f !== food);
-      e.target.classList.remove("selected");
+      btn.classList.remove("selected");
     } else {
       selectedFoods.push(food);
-      e.target.classList.add("selected");
+      btn.classList.add("selected");
     }
 
     document.getElementById("selected-list").innerText =
       selectedFoods.length ? selectedFoods.join("、") : "なし";
-  }
+  });
 });
 
 async function calc() {
@@ -409,7 +421,7 @@ async function calc() {
 
   let html = `
     <div class="card">
-      <h3>1日の合計栄養（すべて100g換算）</h3>
+      <h3>1日の合計栄養（100g換算）</h3>
       <p>カロリー：${summary["カロリー"]} kcal</p>
       <p>たんぱく質：${summary["たんぱく質"]} g</p>
       <p>脂質：${summary["脂質"]} g</p>
@@ -441,4 +453,5 @@ async function calc() {
 
 </body>
 </html>
+
 """
