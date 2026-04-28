@@ -259,13 +259,14 @@ async def ai_analysis(data: AIRequest):
 """
 
     # OpenAI API 呼び出し
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
+    res = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.4
+        temperature=0.2,
+        max_tokens=800
     )
 
-    analysis_text = response.choices[0].message["content"]
+    analysis_text = res.choices[0].message["content"]
 
     return JSONResponse({"analysis": analysis_text})
 
