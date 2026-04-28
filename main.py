@@ -1,383 +1,254 @@
-import os
-import re
-import httpx
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
 
-# -----------------------------
-# 環境変数
-# -----------------------------
-TRANSLATOR_KEY = os.getenv("TRANSLATOR_KEY")
-TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT")
-EDAMAM_APP_ID = os.getenv("EDAMAM_APP_ID")
-EDAMAM_APP_KEY = os.getenv("EDAMAM_APP_KEY")
-
-
-# -----------------------------
-# 入力モデル
-# -----------------------------
 class FoodRequest(BaseModel):
-    foods: str
+    foods: str  # "鶏むね肉,ブロッコリー,卵" など
+
+# ---------------------------------------------------------
+# ★ ここに 100 食材の栄養データ（八訂）をすべて埋めます（次の返答で提供）
+# ---------------------------------------------------------
+FOOD_DB = {
+
+    # --- 肉類（15 食材） ---
+    "鶏むね肉": {"kcal": 120.0, "protein": 22.5, "fat": 2.6, "carb": 0.0, "fiber": 0.0},
+    "鶏もも肉": {"kcal": 200.0, "protein": 16.6, "fat": 14.2, "carb": 0.0, "fiber": 0.0},
+    "ささみ":   {"kcal": 105.0, "protein": 23.9, "fat": 0.8, "carb": 0.0, "fiber": 0.0},
+    "鶏皮":     {"kcal": 513.0, "protein": 9.0,  "fat": 50.0, "carb": 0.1, "fiber": 0.0},
+
+    "豚ロース": {"kcal": 263.0, "protein": 19.3, "fat": 19.2, "carb": 0.2, "fiber": 0.0},
+    "豚バラ":   {"kcal": 386.0, "protein": 14.2, "fat": 34.6, "carb": 0.1, "fiber": 0.0},
+    "豚もも":   {"kcal": 183.0, "protein": 20.5, "fat": 10.2, "carb": 0.2, "fiber": 0.0},
+    "豚ひき肉": {"kcal": 221.0, "protein": 17.7, "fat": 16.1, "carb": 0.2, "fiber": 0.0},
+
+    "牛もも":   {"kcal": 209.0, "protein": 21.2, "fat": 12.0, "carb": 0.3, "fiber": 0.0},
+    "牛肩ロース": {"kcal": 318.0, "protein": 17.7, "fat": 26.4, "carb": 0.3, "fiber": 0.0},
+    "牛バラ":   {"kcal": 371.0, "protein": 14.4, "fat": 32.9, "carb": 0.3, "fiber": 0.0},
+    "牛ひき肉": {"kcal": 224.0, "protein": 17.7, "fat": 16.0, "carb": 0.3, "fiber": 0.0},
+
+    "ハム":     {"kcal": 116.0, "protein": 16.5, "fat": 4.1, "carb": 1.5, "fiber": 0.0},
+    "ベーコン": {"kcal": 405.0, "protein": 12.9, "fat": 39.1, "carb": 1.0, "fiber": 0.0},
+    "ソーセージ": {"kcal": 321.0, "protein": 12.0, "fat": 28.0, "carb": 3.0, "fiber": 0.0},
+
+    # --- 魚介類（20 食材） ---
+    "鮭（サーモン）": {"kcal": 133.0, "protein": 22.5, "fat": 4.5, "carb": 0.1, "fiber": 0.0},
+    "サバ":           {"kcal": 202.0, "protein": 20.7, "fat": 13.8, "carb": 0.3, "fiber": 0.0},
+    "アジ":           {"kcal": 121.0, "protein": 20.7, "fat": 4.5,  "carb": 0.1, "fiber": 0.0},
+    "イワシ":         {"kcal": 217.0, "protein": 19.8, "fat": 15.4, "carb": 0.3, "fiber": 0.0},
+    "ブリ":           {"kcal": 257.0, "protein": 21.4, "fat": 17.6, "carb": 0.3, "fiber": 0.0},
+
+    "タラ":           {"kcal": 77.0,  "protein": 17.6, "fat": 0.5,  "carb": 0.1, "fiber": 0.0},
+    "カレイ":         {"kcal": 95.0,  "protein": 18.0, "fat": 2.0,  "carb": 0.1, "fiber": 0.0},
+    "ヒラメ":         {"kcal": 125.0, "protein": 20.0, "fat": 4.5,  "carb": 0.1, "fiber": 0.0},
+    "マグロ赤身":     {"kcal": 125.0, "protein": 26.4, "fat": 1.4,  "carb": 0.1, "fiber": 0.0},
+    "マグロ中トロ":   {"kcal": 344.0, "protein": 20.0, "fat": 27.5, "carb": 0.1, "fiber": 0.0},
+
+    "エビ":           {"kcal": 82.0,  "protein": 18.4, "fat": 0.6,  "carb": 0.7, "fiber": 0.0},
+    "イカ":           {"kcal": 88.0,  "protein": 17.9, "fat": 1.2,  "carb": 0.4, "fiber": 0.0},
+    "タコ":           {"kcal": 76.0,  "protein": 16.4, "fat": 0.7,  "carb": 0.7, "fiber": 0.0},
+    "ホタテ":         {"kcal": 72.0,  "protein": 13.5, "fat": 0.9,  "carb": 3.5, "fiber": 0.0},
+    "しじみ":         {"kcal": 51.0,  "protein": 6.0,  "fat": 1.0,  "carb": 3.7, "fiber": 0.0},
+
+    "アサリ":         {"kcal": 30.0,  "protein": 5.4,  "fat": 0.4,  "carb": 1.4, "fiber": 0.0},
+    "サンマ":         {"kcal": 310.0, "protein": 18.5, "fat": 25.6, "carb": 0.3, "fiber": 0.0},
+    "ニシン":         {"kcal": 258.0, "protein": 18.0, "fat": 20.0, "carb": 0.3, "fiber": 0.0},
+    "カツオ":         {"kcal": 114.0, "protein": 25.8, "fat": 0.5,  "carb": 0.1, "fiber": 0.0},
+    "うなぎ":         {"kcal": 293.0, "protein": 17.1, "fat": 23.0, "carb": 0.1, "fiber": 0.0},
+
+    # --- 野菜（25 食材） ---
+    "キャベツ":       {"kcal": 23.0, "protein": 1.3, "fat": 0.2, "carb": 5.2, "fiber": 1.8},
+    "レタス":         {"kcal": 12.0, "protein": 0.6, "fat": 0.1, "carb": 2.8, "fiber": 1.1},
+    "白菜":           {"kcal": 14.0, "protein": 0.8, "fat": 0.1, "carb": 3.0, "fiber": 1.0},
+    "ほうれん草":     {"kcal": 20.0, "protein": 2.2, "fat": 0.4, "carb": 3.1, "fiber": 2.8},
+    "小松菜":         {"kcal": 14.0, "protein": 1.5, "fat": 0.2, "carb": 2.4, "fiber": 1.9},
+
+    "ブロッコリー":   {"kcal": 34.0, "protein": 2.8, "fat": 0.4, "carb": 6.6, "fiber": 2.6},
+    "カリフラワー":   {"kcal": 27.0, "protein": 2.6, "fat": 0.2, "carb": 5.2, "fiber": 2.3},
+    "にんじん":       {"kcal": 36.0, "protein": 0.7, "fat": 0.2, "carb": 8.7, "fiber": 2.8},
+    "玉ねぎ":         {"kcal": 37.0, "protein": 1.0, "fat": 0.1, "carb": 8.8, "fiber": 1.5},
+    "じゃがいも":     {"kcal": 76.0, "protein": 1.6, "fat": 0.1, "carb": 17.6, "fiber": 1.3},
+
+    "さつまいも":     {"kcal": 132.0, "protein": 1.2, "fat": 0.2, "carb": 31.9, "fiber": 2.3},
+    "大根":           {"kcal": 18.0, "protein": 0.5, "fat": 0.1, "carb": 4.1, "fiber": 1.3},
+    "ごぼう":         {"kcal": 65.0, "protein": 1.8, "fat": 0.1, "carb": 15.4, "fiber": 5.7},
+    "れんこん":       {"kcal": 66.0, "protein": 1.9, "fat": 0.1, "carb": 15.5, "fiber": 2.0},
+    "たけのこ":       {"kcal": 26.0, "protein": 3.6, "fat": 0.2, "carb": 4.5, "fiber": 2.8},
+
+    "ピーマン":       {"kcal": 22.0, "protein": 0.9, "fat": 0.2, "carb": 5.1, "fiber": 1.9},
+    "パプリカ":       {"kcal": 22.0, "protein": 0.9, "fat": 0.2, "carb": 5.3, "fiber": 1.5},
+    "なす":           {"kcal": 22.0, "protein": 1.0, "fat": 0.1, "carb": 5.1, "fiber": 2.2},
+    "きゅうり":       {"kcal": 14.0, "protein": 1.0, "fat": 0.1, "carb": 3.0, "fiber": 1.1},
+    "トマト":         {"kcal": 20.0, "protein": 0.7, "fat": 0.1, "carb": 4.7, "fiber": 1.0},
+
+    "ミニトマト":     {"kcal": 30.0, "protein": 1.0, "fat": 0.1, "carb": 7.2, "fiber": 1.4},
+    "もやし":         {"kcal": 14.0, "protein": 1.7, "fat": 0.1, "carb": 2.6, "fiber": 1.3},
+    "長ねぎ":         {"kcal": 28.0, "protein": 1.3, "fat": 0.1, "carb": 6.5, "fiber": 2.2},
+    "にら":           {"kcal": 21.0, "protein": 2.0, "fat": 0.3, "carb": 4.4, "fiber": 2.7},
+    "生姜":           {"kcal": 30.0, "protein": 0.9, "fat": 0.3, "carb": 6.6, "fiber": 2.1},
+
+    # --- 果物（10 食材） ---
+    "りんご":       {"kcal": 56.0, "protein": 0.2, "fat": 0.1, "carb": 14.3, "fiber": 1.9},
+    "バナナ":       {"kcal": 93.0, "protein": 1.1, "fat": 0.2, "carb": 22.5, "fiber": 1.1},
+    "みかん":       {"kcal": 45.0, "protein": 0.6, "fat": 0.2, "carb": 11.3, "fiber": 1.0},
+    "いちご":       {"kcal": 34.0, "protein": 0.9, "fat": 0.1, "carb": 8.5,  "fiber": 1.4},
+    "ぶどう":       {"kcal": 59.0, "protein": 0.4, "fat": 0.1, "carb": 15.7, "fiber": 0.5},
+
+    "梨":           {"kcal": 43.0, "protein": 0.2, "fat": 0.1, "carb": 11.0, "fiber": 1.9},
+    "柿":           {"kcal": 60.0, "protein": 0.4, "fat": 0.2, "carb": 16.0, "fiber": 1.6},
+    "スイカ":       {"kcal": 37.0, "protein": 0.6, "fat": 0.1, "carb": 9.5,  "fiber": 0.3},
+    "メロン":       {"kcal": 42.0, "protein": 0.8, "fat": 0.1, "carb": 10.4, "fiber": 0.4},
+    "パイナップル": {"kcal": 51.0, "protein": 0.5, "fat": 0.1, "carb": 13.7, "fiber": 1.5},
+
+    # --- 豆類・大豆製品（10 食材） ---
+    "木綿豆腐":     {"kcal": 72.0, "protein": 6.6, "fat": 3.5, "carb": 2.0, "fiber": 0.4},
+    "絹ごし豆腐":   {"kcal": 56.0, "protein": 4.9, "fat": 3.0, "carb": 1.7, "fiber": 0.3},
+    "厚揚げ":       {"kcal": 150.0, "protein": 10.0, "fat": 10.7, "carb": 3.4, "fiber": 0.5},
+    "油揚げ":       {"kcal": 386.0, "protein": 23.4, "fat": 30.8, "carb": 1.4, "fiber": 0.3},
+    "納豆":         {"kcal": 200.0, "protein": 16.5, "fat": 10.0, "carb": 12.1, "fiber": 6.7},
+
+    "おから":       {"kcal": 111.0, "protein": 6.1, "fat": 3.6, "carb": 13.8, "fiber": 11.5},
+    "ゆで大豆":     {"kcal": 176.0, "protein": 14.8, "fat": 9.0, "carb": 8.4, "fiber": 6.8},
+    "枝豆":         {"kcal": 135.0, "protein": 11.5, "fat": 6.2, "carb": 8.8, "fiber": 5.0},
+    "きな粉":       {"kcal": 437.0, "protein": 36.7, "fat": 23.5, "carb": 28.5, "fiber": 18.1},
+    "豆乳（無調整）": {"kcal": 46.0, "protein": 3.6, "fat": 2.0, "carb": 3.1, "fiber": 0.2},
 
 
-# -----------------------------
-# 翻訳 API（1 食材ずつ確実に翻訳）
-# -----------------------------
-async def translate_to_english(text: str) -> str:
-    url = f"{TRANSLATOR_ENDPOINT}/translate?api-version=3.0&to=en"
+    # --- 乳製品・卵（10 食材） ---
+    "牛乳":           {"kcal": 61.0,  "protein": 3.3,  "fat": 3.8,  "carb": 4.8,  "fiber": 0.0},
+    "低脂肪乳":       {"kcal": 46.0,  "protein": 3.8,  "fat": 1.0,  "carb": 5.2,  "fiber": 0.0},
+    "無脂肪乳":       {"kcal": 34.0,  "protein": 3.6,  "fat": 0.1,  "carb": 5.0,  "fiber": 0.0},
+    "ヨーグルト（無糖）": {"kcal": 62.0,  "protein": 3.6,  "fat": 3.0,  "carb": 5.0,  "fiber": 0.0},
+    "ヨーグルト（加糖）": {"kcal": 95.0,  "protein": 3.6,  "fat": 2.9,  "carb": 14.0, "fiber": 0.0},
 
-    headers = {
-        "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
-        "Ocp-Apim-Subscription-Region": "japanwest",
-        "Content-Type": "application/json"
-    }
+    "プロセスチーズ": {"kcal": 356.0, "protein": 22.7, "fat": 27.4, "carb": 1.3,  "fiber": 0.0},
+    "カッテージチーズ": {"kcal": 98.0,  "protein": 13.3, "fat": 4.3,  "carb": 2.0,  "fiber": 0.0},
+    "バター":         {"kcal": 745.0, "protein": 0.5,  "fat": 82.0, "carb": 0.2,  "fiber": 0.0},
+    "生クリーム":     {"kcal": 433.0, "protein": 2.0,  "fat": 45.0, "carb": 3.0,  "fiber": 0.0},
+    "卵":             {"kcal": 143.0, "protein": 12.6, "fat": 9.5,  "carb": 0.7,  "fiber": 0.0},
 
-    body = [{"text": text}]
+    # --- 主食（米・パン・麺）（10 食材） ---
+    "白ご飯":         {"kcal": 168.0, "protein": 2.5, "fat": 0.3, "carb": 37.1, "fiber": 0.3},
+    "玄米ご飯":       {"kcal": 165.0, "protein": 2.8, "fat": 1.0, "carb": 34.2, "fiber": 1.4},
+    "食パン":         {"kcal": 248.0, "protein": 8.9, "fat": 4.4, "carb": 43.4, "fiber": 2.3},
+    "ロールパン":     {"kcal": 313.0, "protein": 9.7, "fat": 8.6, "carb": 49.4, "fiber": 2.1},
+    "クロワッサン":   {"kcal": 406.0, "protein": 8.2, "fat": 21.0, "carb": 45.0, "fiber": 2.0},
 
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.post(url, headers=headers, json=body)
+    "うどん（ゆで）": {"kcal": 105.0, "protein": 2.6, "fat": 0.4, "carb": 21.6, "fiber": 0.9},
+    "そば（ゆで）":   {"kcal": 132.0, "protein": 4.8, "fat": 1.0, "carb": 24.0, "fiber": 2.0},
+    "パスタ（ゆで）": {"kcal": 149.0, "protein": 5.8, "fat": 0.9, "carb": 28.8, "fiber": 1.8},
+    "中華麺（ゆで）": {"kcal": 149.0, "protein": 5.0, "fat": 1.0, "carb": 28.0, "fiber": 1.0},
+    "餅":             {"kcal": 235.0, "protein": 4.0, "fat": 0.5, "carb": 50.3, "fiber": 0.5},
 
-    return r.json()[0]["translations"][0]["text"]
+}
+# ---------------------------------------------------------
 
-
-# -----------------------------
-# Edamam 栄養取得
-# -----------------------------
-async def fetch_nutrition(english_food: str):
-    query = f"100g {english_food}"
-
-    url = (
-        "https://api.edamam.com/api/nutrition-data"
-        f"?app_id={EDAMAM_APP_ID}"
-        f"&app_key={EDAMAM_APP_KEY}"
-        f"&ingr={query}"
-    )
-
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.get(url)
-
-    return r.json()
-
-
-# -----------------------------
-# 栄養合計
-# -----------------------------
-def summarize_daily_nutrition(results: dict):
+def summarize_from_db(selected: list[str]):
     total = {
-        "カロリー": 0,
-        "たんぱく質": 0,
-        "脂質": 0,
-        "炭水化物": 0,
-        "食物繊維": 0,
-        "糖質": 0,   # ★ 追加
+        "カロリー": 0.0,
+        "たんぱく質": 0.0,
+        "脂質": 0.0,
+        "炭水化物": 0.0,
+        "食物繊維": 0.0,
+        "糖質": 0.0,
     }
-
-    for food, data in results.items():
-        try:
-            nutrients = data["nutrition"]["ingredients"][0]["parsed"][0]["nutrients"]
-
-            carb = nutrients.get("CHOCDF", {}).get("quantity", 0)
-            fiber = nutrients.get("FIBTG", {}).get("quantity", 0)
-            sugar = carb - fiber  # ★ 糖質計算
-
-            total["カロリー"] += nutrients.get("ENERC_KCAL", {}).get("quantity", 0)
-            total["たんぱく質"] += nutrients.get("PROCNT", {}).get("quantity", 0)
-            total["脂質"]     += nutrients.get("FAT", {}).get("quantity", 0)
-            total["炭水化物"] += carb
-            total["食物繊維"] += fiber
-            total["糖質"]     += sugar  # ★ 合計に追加
-
-        except:
-            pass
-
-    # ★ 小数点1桁に丸める
-    for key in total:
-        total[key] = round(total[key], 1)
-
-    return total
-
-
-# -----------------------------
-# メイン API
-# -----------------------------
-@app.post("/nutrition")
-async def get_nutrition(req: FoodRequest):
-
-    # ★ 全角・半角カンマどちらでも分割
-    foods = re.split(r"[、,]", req.foods)
-    foods = [f.strip() for f in foods if f.strip()]
 
     results = {}
 
-    for food in foods:
-        # ★ 1 食材ずつ翻訳 API を呼ぶ
-        english = await translate_to_english(food)
+    for name in selected:
+        name = name.strip()
+        if not name or name not in FOOD_DB:
+            continue
 
-        # ★ 1 食材ずつ Edamam に投げる
-        nutrition = await fetch_nutrition(english)
+        d = FOOD_DB[name]
+        sugar = d["carb"] - d["fiber"]
 
-        results[food] = {
-            "translated": english,
-            "nutrition": nutrition
+        results[name] = {
+            "kcal": d["kcal"],
+            "protein": d["protein"],
+            "fat": d["fat"],
+            "carb": d["carb"],
+            "fiber": d["fiber"],
+            "sugar": sugar,
         }
 
-    summary = summarize_daily_nutrition(results)
+        total["カロリー"]   += d["kcal"]
+        total["たんぱく質"] += d["protein"]
+        total["脂質"]       += d["fat"]
+        total["炭水化物"]   += d["carb"]
+        total["食物繊維"]   += d["fiber"]
+        total["糖質"]       += sugar
 
-    return {"foods": foods, "results": results, "summary": summary}
+    for k in total:
+        total[k] = round(total[k], 1)
+
+    return results, total
 
 
-# -----------------------------
-# UI（HTML）
-# -----------------------------
+@app.post("/nutrition")
+async def nutrition(req: FoodRequest):
+    foods = req.foods.split(",")
+    results, summary = summarize_from_db(foods)
+    return JSONResponse({"results": results, "summary": summary})
+
+
+# ---------------------------------------------------------
+# ★ ここから HTML + JS を返すエンドポイント
+# ---------------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-async def ui():
+def index():
     return """
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>買い物 栄養バランス分析ツール</title>
-
+<title>栄養計算ツール</title>
 <style>
-  body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
-
-  h2 { margin-bottom: 10px; }
-
-  .selected-box {
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  .accordion {
-    background: #fff;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  .panel {
-    display: none;
-    padding: 10px 5px;
-  }
-
-  .food-btn {
-    display: inline-block;
-    padding: 12px 18px;
-    margin: 5px;
-    background: #e8f0fe;
-    border-radius: 10px;
-    font-size: 18px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .food-btn.selected {
-    background: #0078ff;
-    color: white;
-  }
-
-  .card {
-    background: white; padding: 15px; margin-bottom: 15px;
-    border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  button {
-    width: 100%; padding: 14px; font-size: 20px;
-    border: none; background: #0078ff; color: white;
-    border-radius: 8px; margin-top: 20px;
-  }
+  body { font-family: sans-serif; padding: 20px; }
+  .card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; }
+  .food-btn { padding: 10px; margin: 5px; border-radius: 6px; border: 1px solid #888; cursor: pointer; }
+  .food-btn.selected { background-color: #4caf50; color: white; }
+  .accordion { cursor: pointer; padding: 10px; background: #eee; margin-top: 10px; }
+  .panel { display: none; padding: 10px; }
 </style>
 </head>
-
 <body>
 
-<h2>買い物 栄養バランス分析ツール</h2>
+<h2>食材を選択</h2>
+<p>選択中：<span id="selected-list">なし</span></p>
 
-<div style="margin-bottom: 15px; font-size: 16px; color: #555;">
-  ※ このツールは、すべての食材を 100g として計算しています
-</div>
-
-<!-- 選択中の食材 -->
-<div class="selected-box">
-  <strong>選択中の食材：</strong>
-  <span id="selected-list">なし</span>
-</div>
-
-<!-- アコーディオン：カテゴリ別 -->
-
-<div class="accordion">🍖 肉類</div>
-<div class="panel">
-  <div class="food-btn" data-food="鶏むね肉">鶏むね肉</div>
-  <div class="food-btn" data-food="鶏もも肉">鶏もも肉</div>
-  <div class="food-btn" data-food="ささみ">ささみ</div>
-  <div class="food-btn" data-food="豚ロース">豚ロース</div>
-  <div class="food-btn" data-food="豚こま">豚こま</div>
-  <div class="food-btn" data-food="豚バラ">豚バラ</div>
-  <div class="food-btn" data-food="牛こま">牛こま</div>
-  <div class="food-btn" data-food="牛ロース">牛ロース</div>
-  <div class="food-btn" data-food="牛ひき肉">牛ひき肉</div>
-  <div class="food-btn" data-food="豚ひき肉">豚ひき肉</div>
-  <div class="food-btn" data-food="鶏ひき肉">鶏ひき肉</div>
-  <div class="food-btn" data-food="ベーコン">ベーコン</div>
-</div>
-
-<div class="accordion">🥦 野菜</div>
-<div class="panel">
-  <div class="food-btn" data-food="ブロッコリー">ブロッコリー</div>
-  <div class="food-btn" data-food="にんじん">にんじん</div>
-  <div class="food-btn" data-food="玉ねぎ">玉ねぎ</div>
-  <div class="food-btn" data-food="キャベツ">キャベツ</div>
-  <div class="food-btn" data-food="ほうれん草">ほうれん草</div>
-  <div class="food-btn" data-food="レタス">レタス</div>
-  <div class="food-btn" data-food="トマト">トマト</div>
-  <div class="food-btn" data-food="きゅうり">きゅうり</div>
-  <div class="food-btn" data-food="ピーマン">ピーマン</div>
-  <div class="food-btn" data-food="パプリカ">パプリカ</div>
-  <div class="food-btn" data-food="じゃがいも">じゃがいも</div>
-  <div class="food-btn" data-food="さつまいも">さつまいも</div>
-  <div class="food-btn" data-food="大根">大根</div>
-  <div class="food-btn" data-food="白菜">白菜</div>
-  <div class="food-btn" data-food="小松菜">小松菜</div>
-  <div class="food-btn" data-food="もやし">もやし</div>
-  <div class="food-btn" data-food="なす">なす</div>
-  <div class="food-btn" data-food="かぼちゃ">かぼちゃ</div>
-  <div class="food-btn" data-food="ごぼう">ごぼう</div>
-  <div class="food-btn" data-food="ねぎ">ねぎ</div>
-  <div class="food-btn" data-food="しめじ">しめじ</div>
-  <div class="food-btn" data-food="えのき">えのき</div>
-  <div class="food-btn" data-food="しいたけ">しいたけ</div>
-  <div class="food-btn" data-food="舞茸">舞茸</div>
-  <div class="food-btn" data-food="アスパラガス">アスパラガス</div>
-</div>
-
-<div class="accordion">🥚 卵・乳製品</div>
-<div class="panel">
-  <div class="food-btn" data-food="卵">卵</div>
-  <div class="food-btn" data-food="牛乳">牛乳</div>
-  <div class="food-btn" data-food="ヨーグルト">ヨーグルト</div>
-  <div class="food-btn" data-food="チーズ">チーズ</div>
-  <div class="food-btn" data-food="バター">バター</div>
-  <div class="food-btn" data-food="生クリーム">生クリーム</div>
-  <div class="food-btn" data-food="豆乳">豆乳</div>
-  <div class="food-btn" data-food="プロセスチーズ">プロセスチーズ</div>
-  <div class="food-btn" data-food="カッテージチーズ">カッテージチーズ</div>
-  <div class="food-btn" data-food="クリームチーズ">クリームチーズ</div>
-</div>
-
-<div class="accordion">🐟 魚介類</div>
-<div class="panel">
-  <div class="food-btn" data-food="さけ">さけ</div>
-  <div class="food-btn" data-food="まぐろ">まぐろ</div>
-  <div class="food-btn" data-food="ぶり">ぶり</div>
-  <div class="food-btn" data-food="さば">さば</div>
-  <div class="food-btn" data-food="いわし">いわし</div>
-  <div class="food-btn" data-food="たら">たら</div>
-  <div class="food-btn" data-food="えび">えび</div>
-  <div class="food-btn" data-food="いか">いか</div>
-  <div class="food-btn" data-food="ほたて">ほたて</div>
-  <div class="food-btn" data-food="あじ">あじ</div>
-  <div class="food-btn" data-food="さんま">さんま</div>
-  <div class="food-btn" data-food="かつお">かつお</div>
-  <div class="food-btn" data-food="しらす">しらす</div>
-  <div class="food-btn" data-food="かに">かに</div>
-  <div class="food-btn" data-food="たこ">たこ</div>
-</div>
-
-<div class="accordion">🫘 豆類・大豆製品</div>
-<div class="panel">
-  <div class="food-btn" data-food="豆腐">豆腐</div>
-  <div class="food-btn" data-food="納豆">納豆</div>
-  <div class="food-btn" data-food="おから">おから</div>
-  <div class="food-btn" data-food="枝豆">枝豆</div>
-  <div class="food-btn" data-food="厚揚げ">厚揚げ</div>
-  <div class="food-btn" data-food="油揚げ">油揚げ</div>
-  <div class="food-btn" data-food="ひよこ豆">ひよこ豆</div>
-  <div class="food-btn" data-food="レンズ豆">レンズ豆</div>
-  <div class="food-btn" data-food="黒豆">黒豆</div>
-  <div class="food-btn" data-food="大豆">大豆</div>
-</div>
-
-<div class="accordion">🍎 果物</div>
-<div class="panel">
-  <div class="food-btn" data-food="りんご">りんご</div>
-  <div class="food-btn" data-food="バナナ">バナナ</div>
-  <div class="food-btn" data-food="みかん">みかん</div>
-  <div class="food-btn" data-food="いちご">いちご</div>
-  <div class="food-btn" data-food="ぶどう">ぶどう</div>
-  <div class="food-btn" data-food="キウイ">キウイ</div>
-  <div class="food-btn" data-food="パイナップル">パイナップル</div>
-  <div class="food-btn" data-food="桃">桃</div>
-  <div class="food-btn" data-food="梨">梨</div>
-  <div class="food-btn" data-food="柿">柿</div>
-  <div class="food-btn" data-food="スイカ">スイカ</div>
-  <div class="food-btn" data-food="メロン">メロン</div>
-</div>
-
-<div class="accordion">🍚 穀物・パン・麺</div>
-<div class="panel">
-  <div class="food-btn" data-food="ごはん">ごはん</div>
-  <div class="food-btn" data-food="玄米">玄米</div>
-  <div class="food-btn" data-food="食パン">食パン</div>
-  <div class="food-btn" data-food="ロールパン">ロールパン</div>
-  <div class="food-btn" data-food="うどん">うどん</div>
-  <div class="food-btn" data-food="そば">そば</div>
-  <div class="food-btn" data-food="パスタ">パスタ</div>
-  <div class="food-btn" data-food="オートミール">オートミール</div>
-  <div class="food-btn" data-food="コーンフレーク">コーンフレーク</div>
-  <div class="food-btn" data-food="ラーメン">ラーメン</div>
-</div>
-
-<div class="accordion">🍱 加工食品</div>
-<div class="panel">
-  <div class="food-btn" data-food="ハム">ハム</div>
-  <div class="food-btn" data-food="ソーセージ">ソーセージ</div>
-  <div class="food-btn" data-food="ツナ缶">ツナ缶</div>
-  <div class="food-btn" data-food="コーン缶">コーン缶</div>
-  <div class="food-btn" data-food="カレー">カレー</div>
-  <div class="food-btn" data-food="ミートボール">ミートボール</div>
-</div>
-
-<button onclick="calc()">栄養を計算する</button>
+<button onclick="calc()">計算する</button>
 
 <div id="result"></div>
 
 <script>
 let selectedFoods = [];
 
-// アコーディオン動作
-document.querySelectorAll(".accordion").forEach(acc => {
-  acc.addEventListener("click", () => {
-    acc.classList.toggle("active");
-    const panel = acc.nextElementSibling;
+// アコーディオン
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("accordion")) {
+    const panel = e.target.nextElementSibling;
     panel.style.display = panel.style.display === "block" ? "none" : "block";
-  });
+  }
 });
 
-// 食材ボタンのクリック処理
-document.querySelectorAll(".food-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const food = btn.dataset.food;
+// 食材ボタン（ページ読み込み後に動的に生成する場合はここに追加）
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("food-btn")) {
+    const food = e.target.dataset.food;
 
     if (selectedFoods.includes(food)) {
       selectedFoods = selectedFoods.filter(f => f !== food);
-      btn.classList.remove("selected");
+      e.target.classList.remove("selected");
     } else {
       selectedFoods.push(food);
-      btn.classList.add("selected");
+      e.target.classList.add("selected");
     }
 
     document.getElementById("selected-list").innerText =
       selectedFoods.length ? selectedFoods.join("、") : "なし";
-  });
+  }
 });
 
 async function calc() {
@@ -398,10 +269,9 @@ async function calc() {
   const summary = data.summary;
   const results = data.results;
 
-  // 合計カード（糖質を追加）
   let html = `
     <div class="card">
-      <h3>1日の合計栄養</h3>
+      <h3>1日の合計栄養（すべて100g換算）</h3>
       <p>カロリー：${summary["カロリー"]} kcal</p>
       <p>たんぱく質：${summary["たんぱく質"]} g</p>
       <p>脂質：${summary["脂質"]} g</p>
@@ -411,28 +281,18 @@ async function calc() {
     </div>
   `;
 
-  // 食材ごとのカード（糖質を追加）
   for (const food of Object.keys(results)) {
     const item = results[food];
-    const parsed = item?.nutrition?.ingredients?.[0]?.parsed?.[0];
-    const nutrients = parsed?.nutrients ?? {};
-
-    const kcal  = nutrients.ENERC_KCAL?.quantity ?? 0;
-    const P     = nutrients.PROCNT?.quantity ?? 0;
-    const F     = nutrients.FAT?.quantity ?? 0;
-    const carb  = nutrients.CHOCDF?.quantity ?? 0;
-    const fiber = nutrients.FIBTG?.quantity ?? 0;
-    const sugar = carb - fiber;
 
     html += `
       <div class="card">
-        <h3>${food}（${item.translated}）</h3>
-        <p>カロリー：${kcal.toFixed(1)} kcal</p>
-        <p>たんぱく質：${P.toFixed(1)} g</p>
-        <p>脂質：${F.toFixed(1)} g</p>
-        <p>炭水化物：${carb.toFixed(1)} g</p>
-        <p>食物繊維：${fiber.toFixed(1)} g</p>
-        <p>糖質：${sugar.toFixed(1)} g</p>
+        <h3>${food}（100g）</h3>
+        <p>カロリー：${item.kcal.toFixed(1)} kcal</p>
+        <p>たんぱく質：${item.protein.toFixed(1)} g</p>
+        <p>脂質：${item.fat.toFixed(1)} g</p>
+        <p>炭水化物：${item.carb.toFixed(1)} g</p>
+        <p>食物繊維：${item.fiber.toFixed(1)} g</p>
+        <p>糖質：${item.sugar.toFixed(1)} g</p>
       </div>
     `;
   }
