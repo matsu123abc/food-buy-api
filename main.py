@@ -515,7 +515,7 @@ async function calc() {
 
   html += '<div class="card">';
   html += '<h3>AI 栄養分析</h3>';
-  html += '<div>' + aiData.analysis.replace(/\n/g, "<br>") + '</div>';
+  html += '<div>' + aiData.analysis.split("\n").join("<br>") + '</div>';
   html += '</div>';
 
   document.getElementById("result").innerHTML = html;
