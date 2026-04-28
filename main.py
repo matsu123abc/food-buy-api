@@ -331,8 +331,9 @@ async def ui():
   <span id="selected-list">なし</span>
 </div>
 
-<div class="category-title">🍖 肉類</div>
-<div>
+<details>
+  <summary>🍖 肉類（15）</summary>
+
   <div class="food-row">
     <div class="food-btn" data-food="鶏むね肉">鶏むね肉</div>
     <select class="amount-select" data-food="鶏むね肉">
@@ -343,6 +344,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="鶏もも肉">鶏もも肉</div>
     <select class="amount-select" data-food="鶏もも肉">
@@ -353,6 +355,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="ささみ">ささみ</div>
     <select class="amount-select" data-food="ささみ">
@@ -363,6 +366,18 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="鶏皮">鶏皮</div>
+    <select class="amount-select" data-food="鶏皮">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="豚ロース">豚ロース</div>
     <select class="amount-select" data-food="豚ロース">
@@ -373,6 +388,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="豚バラ">豚バラ</div>
     <select class="amount-select" data-food="豚バラ">
@@ -383,6 +399,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="豚もも">豚もも</div>
     <select class="amount-select" data-food="豚もも">
@@ -393,6 +410,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="豚ひき肉">豚ひき肉</div>
     <select class="amount-select" data-food="豚ひき肉">
@@ -403,6 +421,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="牛もも">牛もも</div>
     <select class="amount-select" data-food="牛もも">
@@ -413,6 +432,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="牛肩ロース">牛肩ロース</div>
     <select class="amount-select" data-food="牛肩ロース">
@@ -423,6 +443,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="牛バラ">牛バラ</div>
     <select class="amount-select" data-food="牛バラ">
@@ -433,6 +454,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="牛ひき肉">牛ひき肉</div>
     <select class="amount-select" data-food="牛ひき肉">
@@ -443,6 +465,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="ハム">ハム</div>
     <select class="amount-select" data-food="ハム">
@@ -453,6 +476,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="ベーコン">ベーコン</div>
     <select class="amount-select" data-food="ベーコン">
@@ -463,6 +487,7 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
+
   <div class="food-row">
     <div class="food-btn" data-food="ソーセージ">ソーセージ</div>
     <select class="amount-select" data-food="ソーセージ">
@@ -473,11 +498,12 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
-</div>
 
-<div class="category-title">🐟 魚介</div>
-<div>
-  <!-- 以下、同じパターンで各食材を food-row + food-btn + amount-select にする -->
+</details>
+
+<details>
+  <summary>🐟 魚介類（20）</summary>
+
   <div class="food-row">
     <div class="food-btn" data-food="鮭（サーモン）">鮭（サーモン）</div>
     <select class="amount-select" data-food="鮭（サーモン）">
@@ -488,10 +514,957 @@ async def ui():
       <option value="3">3（300g）</option>
     </select>
   </div>
-  <!-- ここから先は、元のコードの各 food-btn を同じように food-row + amount-select で包んでください -->
-</div>
 
-<!-- 以下のカテゴリ（野菜・卵乳製品・豆類・主食）も同様に food-row + amount-select を適用 -->
+  <div class="food-row">
+    <div class="food-btn" data-food="サバ">サバ</div>
+    <select class="amount-select" data-food="サバ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="アジ">アジ</div>
+    <select class="amount-select" data-food="アジ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="イワシ">イワシ</div>
+    <select class="amount-select" data-food="イワシ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ブリ">ブリ</div>
+    <select class="amount-select" data-food="ブリ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="タラ">タラ</div>
+    <select class="amount-select" data-food="タラ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="カレイ">カレイ</div>
+    <select class="amount-select" data-food="カレイ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ヒラメ">ヒラメ</div>
+    <select class="amount-select" data-food="ヒラメ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="マグロ赤身">マグロ赤身</div>
+    <select class="amount-select" data-food="マグロ赤身">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="マグロ中トロ">マグロ中トロ</div>
+    <select class="amount-select" data-food="マグロ中トロ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="エビ">エビ</div>
+    <select class="amount-select" data-food="エビ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="イカ">イカ</div>
+    <select class="amount-select" data-food="イカ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="タコ">タコ</div>
+    <select class="amount-select" data-food="タコ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ホタテ">ホタテ</div>
+    <select class="amount-select" data-food="ホタテ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="しじみ">しじみ</div>
+    <select class="amount-select" data-food="しじみ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="アサリ">アサリ</div>
+    <select class="amount-select" data-food="アサリ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="サンマ">サンマ</div>
+    <select class="amount-select" data-food="サンマ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ニシン">ニシン</div>
+    <select class="amount-select" data-food="ニシン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="カツオ">カツオ</div>
+    <select class="amount-select" data-food="カツオ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="うなぎ">うなぎ</div>
+    <select class="amount-select" data-food="うなぎ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
+
+<details>
+  <summary>🥬 野菜（25）</summary>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="キャベツ">キャベツ</div>
+    <select class="amount-select" data-food="キャベツ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="レタス">レタス</div>
+    <select class="amount-select" data-food="レタス">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="白菜">白菜</div>
+    <select class="amount-select" data-food="白菜">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ほうれん草">ほうれん草</div>
+    <select class="amount-select" data-food="ほうれん草">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="小松菜">小松菜</div>
+    <select class="amount-select" data-food="小松菜">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ブロッコリー">ブロッコリー</div>
+    <select class="amount-select" data-food="ブロッコリー">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="カリフラワー">カリフラワー</div>
+    <select class="amount-select" data-food="カリフラワー">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="にんじん">にんじん</div>
+    <select class="amount-select" data-food="にんじん">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="玉ねぎ">玉ねぎ</div>
+    <select class="amount-select" data-food="玉ねぎ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="じゃがいも">じゃがいも</div>
+    <select class="amount-select" data-food="じゃがいも">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="さつまいも">さつまいも</div>
+    <select class="amount-select" data-food="さつまいも">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="大根">大根</div>
+    <select class="amount-select" data-food="大根">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ごぼう">ごぼう</div>
+    <select class="amount-select" data-food="ごぼう">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="れんこん">れんこん</div>
+    <select class="amount-select" data-food="れんこん">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="たけのこ">たけのこ</div>
+    <select class="amount-select" data-food="たけのこ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ピーマン">ピーマン</div>
+    <select class="amount-select" data-food="ピーマン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="パプリカ">パプリカ</div>
+    <select class="amount-select" data-food="パプリカ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="なす">なす</div>
+    <select class="amount-select" data-food="なす">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="きゅうり">きゅうり</div>
+    <select class="amount-select" data-food="きゅうり">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="トマト">トマト</div>
+    <select class="amount-select" data-food="トマト">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ミニトマト">ミニトマト</div>
+    <select class="amount-select" data-food="ミニトマト">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="もやし">もやし</div>
+    <select class="amount-select" data-food="もやし">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="長ねぎ">長ねぎ</div>
+    <select class="amount-select" data-food="長ねぎ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="にら">にら</div>
+    <select class="amount-select" data-food="にら">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="生姜">生姜</div>
+    <select class="amount-select" data-food="生姜">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
+
+<details>
+  <summary>🍎 果物（10）</summary>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="りんご">りんご</div>
+    <select class="amount-select" data-food="りんご">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="バナナ">バナナ</div>
+    <select class="amount-select" data-food="バナナ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="みかん">みかん</div>
+    <select class="amount-select" data-food="みかん">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="いちご">いちご</div>
+    <select class="amount-select" data-food="いちご">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ぶどう">ぶどう</div>
+    <select class="amount-select" data-food="ぶどう">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="梨">梨</div>
+    <select class="amount-select" data-food="梨">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="柿">柿</div>
+    <select class="amount-select" data-food="柿">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="スイカ">スイカ</div>
+    <select class="amount-select" data-food="スイカ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="メロン">メロン</div>
+    <select class="amount-select" data-food="メロン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="パイナップル">パイナップル</div>
+    <select class="amount-select" data-food="パイナップル">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
+
+<details>
+  <summary>🌱 豆類・大豆製品（10）</summary>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="木綿豆腐">木綿豆腐</div>
+    <select class="amount-select" data-food="木綿豆腐">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="絹ごし豆腐">絹ごし豆腐</div>
+    <select class="amount-select" data-food="絹ごし豆腐">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="厚揚げ">厚揚げ</div>
+    <select class="amount-select" data-food="厚揚げ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="油揚げ">油揚げ</div>
+    <select class="amount-select" data-food="油揚げ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="納豆">納豆</div>
+    <select class="amount-select" data-food="納豆">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="おから">おから</div>
+    <select class="amount-select" data-food="おから">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ゆで大豆">ゆで大豆</div>
+    <select class="amount-select" data-food="ゆで大豆">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="枝豆">枝豆</div>
+    <select class="amount-select" data-food="枝豆">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="きな粉">きな粉</div>
+    <select class="amount-select" data-food="きな粉">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="豆乳（無調整）">豆乳（無調整）</div>
+    <select class="amount-select" data-food="豆乳（無調整）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
+
+<details>
+  <summary>🥚 乳製品・卵（10）</summary>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="牛乳">牛乳</div>
+    <select class="amount-select" data-food="牛乳">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="低脂肪乳">低脂肪乳</div>
+    <select class="amount-select" data-food="低脂肪乳">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="無脂肪乳">無脂肪乳</div>
+    <select class="amount-select" data-food="無脂肪乳">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ヨーグルト（無糖）">ヨーグルト（無糖）</div>
+    <select class="amount-select" data-food="ヨーグルト（無糖）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ヨーグルト（加糖）">ヨーグルト（加糖）</div>
+    <select class="amount-select" data-food="ヨーグルト（加糖）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="プロセスチーズ">プロセスチーズ</div>
+    <select class="amount-select" data-food="プロセスチーズ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="カッテージチーズ">カッテージチーズ</div>
+    <select class="amount-select" data-food="カッテージチーズ">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="バター">バター</div>
+    <select class="amount-select" data-food="バター">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="生クリーム">生クリーム</div>
+    <select class="amount-select" data-food="生クリーム">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="卵">卵</div>
+    <select class="amount-select" data-food="卵">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
+
+<details>
+  <summary>🍚 主食（10）</summary>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="白ご飯">白ご飯</div>
+    <select class="amount-select" data-food="白ご飯">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="玄米ご飯">玄米ご飯</div>
+    <select class="amount-select" data-food="玄米ご飯">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="食パン">食パン</div>
+    <select class="amount-select" data-food="食パン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="ロールパン">ロールパン</div>
+    <select class="amount-select" data-food="ロールパン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="クロワッサン">クロワッサン</div>
+    <select class="amount-select" data-food="クロワッサン">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="うどん（ゆで）">うどん（ゆで）</div>
+    <select class="amount-select" data-food="うどん（ゆで）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="そば（ゆで）">そば（ゆで）</div>
+    <select class="amount-select" data-food="そば（ゆで）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="パスタ（ゆで）">パスタ（ゆで）</div>
+    <select class="amount-select" data-food="パスタ（ゆで）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="中華麺（ゆで）">中華麺（ゆで）</div>
+    <select class="amount-select" data-food="中華麺（ゆで）">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+  <div class="food-row">
+    <div class="food-btn" data-food="餅">餅</div>
+    <select class="amount-select" data-food="餅">
+      <option value="1">1（100g）</option>
+      <option value="0.5">0.5（50g）</option>
+      <option value="1.5">1.5（150g）</option>
+      <option value="2">2（200g）</option>
+      <option value="3">3（300g）</option>
+    </select>
+  </div>
+
+</details>
 
 <button onclick="calc()">栄養を計算する</button>
 
