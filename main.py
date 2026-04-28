@@ -253,7 +253,6 @@ async def ai_analysis(data: dict):
 @app.get("/", response_class=HTMLResponse)
 async def ui():
     return """
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -262,50 +261,23 @@ async def ui():
 
 <style>
   body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
-
   h2 { margin-bottom: 10px; }
-
-  .info-note {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 15px;
-  }
-
+  .info-note { font-size: 16px; color: #555; margin-bottom: 15px; }
   .selected-box {
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: #fff; padding: 10px; border-radius: 10px;
+    margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-
-  .category-title {
-    font-size: 20px;
-    margin-top: 25px;
-    margin-bottom: 10px;
-  }
-
+  .category-title { font-size: 20px; margin-top: 25px; margin-bottom: 10px; }
   .food-btn {
-    display: inline-block;
-    padding: 12px 18px;
-    margin: 5px;
-    background: #e8f0fe;
-    border-radius: 10px;
-    font-size: 18px;
-    cursor: pointer;
-    user-select: none;
+    display: inline-block; padding: 12px 18px; margin: 5px;
+    background: #e8f0fe; border-radius: 10px; font-size: 18px;
+    cursor: pointer; user-select: none;
   }
-
-  .food-btn.selected {
-    background: #0078ff;
-    color: white;
-  }
-
+  .food-btn.selected { background: #0078ff; color: white; }
   .card {
     background: white; padding: 15px; margin-bottom: 15px;
     border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-
   button {
     width: 100%; padding: 14px; font-size: 20px;
     border: none; background: #0078ff; color: white;
@@ -346,7 +318,7 @@ async def ui():
 
 <div class="category-title">🐟 魚介</div>
 <div>
-  <div class="food-btn" data-food="鮭（サーモン）">鮭（サーモン）</div>
+  <div class="food-btn" data-food="鮭(サーモン)">鮭(サーモン)</div>
   <div class="food-btn" data-food="サバ">サバ</div>
   <div class="food-btn" data-food="アジ">アジ</div>
   <div class="food-btn" data-food="イワシ">イワシ</div>
@@ -401,8 +373,8 @@ async def ui():
 <div>
   <div class="food-btn" data-food="卵">卵</div>
   <div class="food-btn" data-food="牛乳">牛乳</div>
-  <div class="food-btn" data-food="ヨーグルト（無糖）">ヨーグルト（無糖）</div>
-  <div class="food-btn" data-food="ヨーグルト（加糖）">ヨーグルト（加糖）</div>
+  <div class="food-btn" data-food="ヨーグルト(無糖)">ヨーグルト(無糖)</div>
+  <div class="food-btn" data-food="ヨーグルト(加糖)">ヨーグルト(加糖)</div>
   <div class="food-btn" data-food="プロセスチーズ">プロセスチーズ</div>
   <div class="food-btn" data-food="カッテージチーズ">カッテージチーズ</div>
   <div class="food-btn" data-food="バター">バター</div>
@@ -417,7 +389,7 @@ async def ui():
   <div class="food-btn" data-food="おから">おから</div>
   <div class="food-btn" data-food="枝豆">枝豆</div>
   <div class="food-btn" data-food="きな粉">きな粉</div>
-  <div class="food-btn" data-food="豆乳（無調整）">豆乳（無調整）</div>
+  <div class="food-btn" data-food="豆乳(無調整)">豆乳(無調整)</div>
 </div>
 
 <div class="category-title">🍚 主食</div>
@@ -427,10 +399,10 @@ async def ui():
   <div class="food-btn" data-food="食パン">食パン</div>
   <div class="food-btn" data-food="ロールパン">ロールパン</div>
   <div class="food-btn" data-food="クロワッサン">クロワッサン</div>
-  <div class="food-btn" data-food="うどん（ゆで）">うどん（ゆで）</div>
-  <div class="food-btn" data-food="そば（ゆで）">そば（ゆで）</div>
-  <div class="food-btn" data-food="パスタ（ゆで）">パスタ（ゆで）</div>
-  <div class="food-btn" data-food="中華麺（ゆで）">中華麺（ゆで）</div>
+  <div class="food-btn" data-food="うどん(ゆで)">うどん(ゆで)</div>
+  <div class="food-btn" data-food="そば(ゆで)">そば(ゆで)</div>
+  <div class="food-btn" data-food="パスタ(ゆで)">パスタ(ゆで)</div>
+  <div class="food-btn" data-food="中華麺(ゆで)">中華麺(ゆで)</div>
   <div class="food-btn" data-food="餅">餅</div>
 </div>
 
@@ -443,7 +415,6 @@ async def ui():
 <script>
 let selectedFoods = [];
 
-// 食材ボタンのクリック処理
 document.querySelectorAll(".food-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const food = btn.dataset.food;
@@ -504,7 +475,6 @@ async function calc() {
     html += '</div>';
   }
 
-  // --- AI 栄養分析 ---
   const aiRes = await fetch("/ai_analysis", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -524,4 +494,4 @@ async function calc() {
 
 </body>
 </html>
-"""
+"""  
