@@ -211,6 +211,13 @@ async def ui():
 
   h2 { margin-bottom: 10px; }
 
+  /* ← 追加した部分 */
+  .info-note {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+  }
+
   .selected-box {
     background: #fff;
     padding: 10px;
@@ -257,6 +264,8 @@ async def ui():
 <body>
 
 <h2>買い物 栄養バランス分析ツール</h2>
+
+<div class="info-note">※ すべて100g換算で計算しています</div>
 
 <!-- 選択中の食材 -->
 <div class="selected-box">
