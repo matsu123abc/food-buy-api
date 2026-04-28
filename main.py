@@ -266,10 +266,9 @@ async def ai_analysis(data: AIRequest):
         max_tokens=800
     )
 
-    analysis_text = res.choices[0].message["content"]
+    analysis_text = res.choices[0].message.content.strip()
 
     return JSONResponse({"analysis": analysis_text})
-
 
 # ---------------------------------------------------------
 # ★ ここから HTML + JS を返すエンドポイント
