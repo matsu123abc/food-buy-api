@@ -1713,7 +1713,9 @@ async function calc() {
       });
 
       const data = await res.json();
-      document.getElementById("recipe-result").innerHTML = data.recipe;
+      document.getElementById("recipe-result").innerHTML =
+        data.recipe.split("\\n").join("<br>");
+
   });
 }
 </script>
