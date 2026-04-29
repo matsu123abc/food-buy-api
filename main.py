@@ -1505,6 +1505,19 @@ async def ui():
 
 <div id="result"></div>
 
+<div class="card">
+  <label for="recipe-style">料理ジャンル：</label>
+  <select id="recipe-style">
+    <option value="和食">和食</option>
+    <option value="洋食">洋食</option>
+    <option value="中華">中華</option>
+  </select>
+</div>
+
+<button id="recipe-btn">レシピを提案する</button>
+
+<div id="recipe-result" class="card"></div>
+
 <script>
 let selectedFoods = [];
 
