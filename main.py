@@ -1505,7 +1505,9 @@ async def ui():
 
 <div id="result"></div>
 
-<div class="card">
+<button id="recipe-btn">レシピを提案する</button>
+
+<div class="card" style="margin-top: 15px;">
   <label for="recipe-style">料理ジャンル：</label>
   <select id="recipe-style">
     <option value="和食">和食</option>
@@ -1513,8 +1515,6 @@ async def ui():
     <option value="中華">中華</option>
   </select>
 </div>
-
-<button id="recipe-btn">レシピを提案する</button>
 
 <div id="recipe-result" class="card"></div>
 
