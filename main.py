@@ -270,6 +270,56 @@ async def ai_analysis(data: AIRequest):
 
     return JSONResponse({"analysis": analysis_text})
 
+@app.post("/ai_recipe")
+async def ai_recipe(request: Request):
+    data = await request.json()
+
+    selected = data.get("selectedFoods", [])
+    summary = data.get("summary", {})
+    details = data.get("details", {})
+    style = data.get("style", "和食")
+
+    prompt = f"""
+あなたはプロの料理家です。
+以下の食材と栄養データを使って、{style} の料理を3つ提案してください。
+
+### 1. 食材リスト
+{selected}
+
+### 2. 合計栄養（summary）
+{summary}
+
+### 3. 食材ごとの栄養詳細（details）
+{details}
+
+---
+
+### 出力フォーマット（必ずこの形式で出力）
+
+### 1. 料理名
+1行
+
+### 2. 調理方法
+- 箇条書きで簡潔に
+
+### 3. 栄養的なポイント
+- 箇条書きで2〜4個
+
+（これを3品分）
+"""
+
+    res = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_tokens=800
+    )
+
+    recipe_text = res.choices[0].message.content.strip()
+
+    return JSONResponse({"recipe": recipe_text})
+
+
 # ---------------------------------------------------------
 # ★ ここから HTML + JS を返すエンドポイント
 # ---------------------------------------------------------
@@ -1645,6 +1695,26 @@ async function calc() {
   html += '</div>';
 
   document.getElementById("result").innerHTML = html;
+
+  document.getElementById("recipe-btn").addEventListener("click", async () => {
+      const style = document.getElementById("recipe-style").value;
+
+      const body = {
+          selectedFoods: selectedFoods,
+          summary: adjustedSummary,   // ← 修正
+          details: adjustedResults,   // ← 修正
+          style: style
+      };
+
+      const res = await fetch("/ai_recipe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      document.getElementById("recipe-result").innerHTML = data.recipe;
+  });
 }
 </script>
 
