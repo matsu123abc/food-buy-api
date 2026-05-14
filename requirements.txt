@@ -5,3 +5,6 @@ openai
 python-dotenv
 pandas
 openpyxl
+
+azure-search-documents
+azure-core

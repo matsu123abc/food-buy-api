@@ -1723,3 +1723,64 @@ async function calc() {
 </body>
 </html>
 """
+
+# ============================
+# RAG（Azure AI Search）
+# ============================
+from azure.search.documents import SearchClient
+from azure.core.credentials import AzureKeyCredential
+
+search_client = SearchClient(
+    endpoint=os.getenv("AZURE_SEARCH_ENDPOINT"),
+    index_name="aging-rag-index",
+    credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_KEY"))
+)
+
+class RAGRequest(BaseModel):
+    query: str
+    top_k: int = 5
+
+@app.post("/rag_search")
+async def rag_search(req: RAGRequest):
+
+    results = search_client.search(
+        search_text=req.query,
+        query_type="semantic",
+        semantic_configuration_name="default",
+        top=req.top_k,
+        select=["id", "title", "content"]
+    )
+
+    docs = []
+    for r in results:
+        docs.append({
+            "id": r["id"],
+            "title": r["title"],
+            "content": r["content"]
+        })
+
+    prompt = f"""
+あなたは専門家です。
+以下の参考文献を使って質問に答えてください。
+
+### 質問
+{req.query}
+
+### 参考文献
+{docs}
+
+### 回答形式
+- 箇条書き中心
+- わかりやすく
+"""
+
+    res = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_tokens=800
+    )
+
+    answer = res.choices[0].message.content.strip()
+
+    return JSONResponse({"answer": answer, "docs": docs})
