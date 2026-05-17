@@ -306,8 +306,10 @@ async def ai_analysis(data: AIRequest):
 - 不足栄養素を補うための具体的な食材を提案
 
 ### 7. 文献に基づく根拠（RAG）
-- 箇条書きで3〜5個
-- 文献の内容を要約して引用
+- 食材ごとに根拠をまとめる
+- 例：
+  - アジ：文献「○○」では DHA・EPA が老化予防に有効とされている
+  - ほうれん草：文献「○○」では鉄・葉酸が疲労軽減に寄与するとされている
 
 ### 8. 総合コメント
 短くわかりやすくまとめる
@@ -327,9 +329,12 @@ async def ai_analysis(data: AIRequest):
 
     return JSONResponse({
         "analysis": analysis_text,
-        "docs": docs  # ← UI で根拠を表示したい場合に使える
+        "docs": docs,
+        "docs_by_food": {
+            food: [d for d in docs if d["food"] == food]
+            for food in foods
+        }
     })
-
 
 @app.post("/ai_recipe")
 async def ai_recipe(request: Request):
@@ -1616,6 +1621,8 @@ async def ui():
 
 <div id="result"></div>
 
+<div id="rag-food-cards"></div>
+
 <button id="recipe-btn">レシピを提案する</button>
 
 <div class="card" style="margin-top: 15px;">
@@ -1756,6 +1763,35 @@ async function calc() {
   html += '</div>';
 
   document.getElementById("result").innerHTML = html;
+
+  // ★★★ ここに RAG 食材別カード表示を追加 ★★★
+  const ragArea = document.getElementById("rag-food-cards");
+  ragArea.innerHTML = "";  // 初期化
+
+  const docsByFood = aiData.docs_by_food;
+
+  for (const food of Object.keys(docsByFood)) {
+    const items = docsByFood[food];
+    if (!items || items.length === 0) continue;
+
+    let card = `<div class="card" style="margin-top:15px;">
+                  <h3>${food} の文献根拠</h3>`;
+
+    for (const doc of items) {
+      card += `
+        <div style="margin-bottom:10px;">
+          <strong>${doc.title}</strong><br>
+          <span style="font-size:14px; color:#555;">
+            ${doc.content.substring(0, 120)}...
+          </span>
+        </div>
+      `;
+    }
+
+    card += `</div>`;
+    ragArea.innerHTML += card;
+  }
+  // ★★★ ここまで追加 ★★★
 
   document.getElementById("recipe-btn").addEventListener("click", async () => {
       const style = document.getElementById("recipe-style").value;
