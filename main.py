@@ -229,20 +229,6 @@ async def ai_analysis(data: AIRequest):
     foods = data.foods
     details = data.details
 
-    # ============================
-    # ① RAG（Azure AI Search）
-    # ============================
-    # 質問文を自動生成（例：「鶏むね肉 ブロッコリー 老化 栄養」）
-    query_text = " ".join(foods) + " 老化 栄養 健康"
-
-    results = search_client.search(
-        search_text=query_text,
-        query_type="semantic",
-        semantic_configuration_name="default",
-        top=5,
-        select=["id", "title", "content"]
-    )
-
     docs = []
 
     for food in foods:
