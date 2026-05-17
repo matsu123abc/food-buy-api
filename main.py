@@ -202,9 +202,20 @@ async def nutrition(req: FoodRequest):
     results, summary = summarize_from_db(foods)
     return JSONResponse({"results": results, "summary": summary})
 
+# ============================
+# RAG（Azure AI Search）
+# ============================
+from azure.search.documents import SearchClient
+from azure.core.credentials import AzureKeyCredential
+
+search_client = SearchClient(
+    endpoint=os.getenv("AZURE_SEARCH_ENDPOINT"),
+    index_name="aging-rag-index",
+    credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_KEY"))
+)
 
 # -----------------------------
-# AI コメント生成（SerpAPI ニュース版）
+# AI コメント生成（RAG 統合版）
 # -----------------------------
 class AIRequest(BaseModel):
     summary: dict
@@ -218,11 +229,36 @@ async def ai_analysis(data: AIRequest):
     foods = data.foods
     details = data.details
 
+    # ============================
+    # ① RAG（Azure AI Search）
+    # ============================
+    # 質問文を自動生成（例：「鶏むね肉 ブロッコリー 老化 栄養」）
+    query_text = " ".join(foods) + " 老化 栄養 健康"
+
+    results = search_client.search(
+        search_text=query_text,
+        query_type="semantic",
+        semantic_configuration_name="default",
+        top=5,
+        select=["id", "title", "content"]
+    )
+
+    docs = []
+    for r in results:
+        docs.append({
+            "id": r["id"],
+            "title": r["title"],
+            "content": r["content"]
+        })
+
+    # ============================
+    # ② GPT への統合プロンプト
+    # ============================
     prompt = f"""
 あなたはプロの栄養士兼、買い物アドバイザーです。
-以下のデータをもとに、総合的な栄養分析と買い物アドバイスを行ってください。
+以下のデータと文献（RAG）をもとに、総合的な栄養分析と買い物アドバイスを行ってください。
 
-### 1. 合計栄養の分析（summary）
+### 1. 合計栄養（summary）
 {summary}
 
 ### 2. 選択された食材（foods）
@@ -230,6 +266,9 @@ async def ai_analysis(data: AIRequest):
 
 ### 3. 食材ごとの栄養詳細（details）
 {details}
+
+### 4. 文献（RAG 検索結果）
+{docs}
 
 ---
 
@@ -254,21 +293,31 @@ async def ai_analysis(data: AIRequest):
 ### 6. 追加購入アドバイス
 - 不足栄養素を補うための具体的な食材を提案
 
-### 7. 総合コメント
+### 7. 文献に基づく根拠（RAG）
+- 箇条書きで3〜5個
+- 文献の内容を要約して引用
+
+### 8. 総合コメント
 短くわかりやすくまとめる
 """
 
-    # OpenAI API 呼び出し
+    # ============================
+    # ③ GPT 呼び出し
+    # ============================
     res = client.chat.completions.create(
         model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2,
-        max_tokens=800
+        max_tokens=1200
     )
 
     analysis_text = res.choices[0].message.content.strip()
 
-    return JSONResponse({"analysis": analysis_text})
+    return JSONResponse({
+        "analysis": analysis_text,
+        "docs": docs  # ← UI で根拠を表示したい場合に使える
+    })
+
 
 @app.post("/ai_recipe")
 async def ai_recipe(request: Request):
@@ -1723,64 +1772,3 @@ async function calc() {
 </body>
 </html>
 """
-
-# ============================
-# RAG（Azure AI Search）
-# ============================
-from azure.search.documents import SearchClient
-from azure.core.credentials import AzureKeyCredential
-
-search_client = SearchClient(
-    endpoint=os.getenv("AZURE_SEARCH_ENDPOINT"),
-    index_name="aging-rag-index",
-    credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_KEY"))
-)
-
-class RAGRequest(BaseModel):
-    query: str
-    top_k: int = 5
-
-@app.post("/rag_search")
-async def rag_search(req: RAGRequest):
-
-    results = search_client.search(
-        search_text=req.query,
-        query_type="semantic",
-        semantic_configuration_name="default",
-        top=req.top_k,
-        select=["id", "title", "content"]
-    )
-
-    docs = []
-    for r in results:
-        docs.append({
-            "id": r["id"],
-            "title": r["title"],
-            "content": r["content"]
-        })
-
-    prompt = f"""
-あなたは専門家です。
-以下の参考文献を使って質問に答えてください。
-
-### 質問
-{req.query}
-
-### 参考文献
-{docs}
-
-### 回答形式
-- 箇条書き中心
-- わかりやすく
-"""
-
-    res = client.chat.completions.create(
-        model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=800
-    )
-
-    answer = res.choices[0].message.content.strip()
-
-    return JSONResponse({"answer": answer, "docs": docs})
