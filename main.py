@@ -244,12 +244,24 @@ async def ai_analysis(data: AIRequest):
     )
 
     docs = []
-    for r in results:
-        docs.append({
-            "id": r["id"],
-            "title": r["title"],
-            "content": r["content"]
-        })
+
+    for food in foods:
+        q = f"{food} 老化 健康 栄養 効果 抗酸化"
+        results = search_client.search(
+            search_text=q,
+            query_type="semantic",
+            semantic_configuration_name="default",
+            top=2,
+            select=["id", "title", "content"]
+        )
+
+        for r in results:
+            docs.append({
+                "food": food,
+                "id": r["id"],
+                "title": r["title"],
+                "content": r["content"]
+            })
 
     # ============================
     # ② GPT への統合プロンプト
